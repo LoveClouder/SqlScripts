@@ -1,0 +1,1330 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>ContentFilters</key>
+	<dict/>
+	<key>auto_connect</key>
+	<true/>
+	<key>data</key>
+	<dict>
+		<key>connection</key>
+		<dict>
+			<key>database</key>
+			<string>gina</string>
+			<key>host</key>
+			<string>s3760i.mars.grid.sina.com.cn</string>
+			<key>kcid</key>
+			<string>8421912374166567031</string>
+			<key>name</key>
+			<string>扶翼粉丝通DB</string>
+			<key>port</key>
+			<integer>3760</integer>
+			<key>rdbms_type</key>
+			<string>mysql</string>
+			<key>sslCACertFileLocation</key>
+			<string></string>
+			<key>sslCACertFileLocationEnabled</key>
+			<integer>0</integer>
+			<key>sslCertificateFileLocation</key>
+			<string></string>
+			<key>sslCertificateFileLocationEnabled</key>
+			<integer>0</integer>
+			<key>sslKeyFileLocation</key>
+			<string></string>
+			<key>sslKeyFileLocationEnabled</key>
+			<integer>0</integer>
+			<key>type</key>
+			<string>SPTCPIPConnection</string>
+			<key>useSSL</key>
+			<integer>0</integer>
+			<key>user</key>
+			<string>gina_mis</string>
+		</dict>
+		<key>session</key>
+		<dict>
+			<key>connectionEncoding</key>
+			<string>utf8</string>
+			<key>contentFilter</key>
+			<dict/>
+			<key>contentPageNumber</key>
+			<integer>1</integer>
+			<key>contentSelection</key>
+			<data>
+			YnBsaXN0MDDUAQIDBAUGOjtYJHZlcnNpb25YJG9iamVjdHNZJGFy
+			Y2hpdmVyVCR0b3ASAAGGoK8QDwcIFRYXGBkfICEoLDA0OFUkbnVs
+			bNMJCgsMEBRXTlMua2V5c1pOUy5vYmplY3RzViRjbGFzc6MNDg+A
+			AoADgASjERITgAWABoAKgA5UdHlwZVRyb3dzVGtleXNfECZTZWxl
+			Y3Rpb25EZXRhaWxUeXBlUHJpbWFyeUtleWVkRGV0YWlsc9MJCgsa
+			HB6hG4AHoR2ACIAJVDE0MjUJ0iIjJCVaJGNsYXNzbmFtZVgkY2xh
+			c3Nlc18QE05TTXV0YWJsZURpY3Rpb25hcnmjJCYnXE5TRGljdGlv
+			bmFyeVhOU09iamVjdNIKCykroSqAC4AN0gstLi9ZTlMuc3RyaW5n
+			gAxbaW5kdXN0cnlfaWTSIiMxMl8QD05TTXV0YWJsZVN0cmluZ6Mx
+			MydYTlNTdHJpbmfSIiM1Nl5OU011dGFibGVBcnJheaM1NydXTlNB
+			cnJhedIiIyY5oiYnXxAPTlNLZXllZEFyY2hpdmVy0Tw9VGRhdGGA
+			AQAIABEAGgAjAC0AMgA3AEkATwBWAF4AaQBwAHQAdgB4AHoAfgCA
+			AIIAhACGAIsAkACVAL4AxQDHAMkAywDNAM8A1ADVANoA5QDuAQQB
+			CAEVAR4BIwElAScBKQEuATgBOgFGAUsBXQFhAWoBbwF+AYIBigGP
+			AZIBpAGnAawAAAAAAAACAQAAAAAAAAA+AAAAAAAAAAAAAAAAAAAB
+			rg==
+			</data>
+			<key>contentSortColIsAsc</key>
+			<true/>
+			<key>contentViewport</key>
+			<string>{{0, 1130}, {1010, 525}}</string>
+			<key>isToolbarVisible</key>
+			<true/>
+			<key>queries</key>
+			<string>SET @REPORT_START_DATE = '2014-02-01';
+SET @REPORT_END_DATE='2014-02-28';
+SET @PREMONTH_START_DATE = DATE_ADD(@REPORT_START_DATE, INTERVAL -1 MONTH);
+SET @PREMONTH_END_DATE = DATE_ADD(@REPORT_START_DATE, INTERVAL -1 DAY);
+SET @NEXTMONTH_START_DATE = DATE_ADD(@REPORT_END_DATE, INTERVAL 1 DAY);
+SET @DAYCOUNT_OF_MONTH = DATEDIFF(DATE_ADD(@REPORT_START_DATE, interval 1 month), @REPORT_START_DATE);
+SET @AGENT_ID = (SELECT agent_id FROM agent ag WHERE ag.full_name = '来客创新（北京）科技发展有限公司');
+-- SELECT @REPORT_START_DATE,@REPORT_END_DATE,@PREMONTH_START_DATE,@PREMONTH_END_DATE,@DAYCOUNT_OF_MONTH,@AGENT_ID;
+
+###全国SME平均值###
+set @ID = 0;
+set @ID2 = 0;
+select
+	'-1' as rank,
+	aa.reportdate,
+	'' as agent_id,
+	'全国平均' as agent_name,
+	AVG(aa.balance) as balance,
+	AVG(aa.impression) as impression,
+	AVG(click) as click,
+	AVG(pay) as pay,
+	AVG(ARPU) as ARPU,
+	'-1' as pre_rank,
+	AVG(pre_impression) as pre_impression,
+	AVG(pre_click) as pre_click,
+	AVG(pre_pay) as pre_pay
+from (select
+		'1' as rank,
+		a.*
+	from (select
+		DATE_FORMAT(@REPORT_END_DATE, '%Y-%m') as reportdate,
+		ag.agent_id,
+		ag.full_name as agent_name,
+		ba.balance,
+		sum(esa.impression) as impression,
+		sum(esa.click) as click,
+		sum(esa.pay)/100 as pay,
+		sum(esa.pay)/@DAYCOUNT_OF_MONTH/100 as ARPU,
+		pre.pre_rank,
+		pre.impression as pre_impression,
+		pre.click as pre_click,
+		pre.pay as pre_pay
+	from `ea_stat_gender` esa
+	-- inner join client c on esa.clientid = c.client_id
+	inner join agent ag on esa.agentid = ag.agent_id and ag.full_name not in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE')
+	left join (select
+			'1' as pre_rank,
+			b.*
+		from (select 
+					agentid,
+					sum(impression) as impression,
+					sum(click) as click,
+					sum(pay)/100 as pay
+				from `ea_stat_gender` esa
+				inner join agent ag on esa.agentid = ag.agent_id and ag.full_name not in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE')
+				where statdate between @PREMONTH_START_DATE and @PREMONTH_END_DATE
+				group by agentid order by sum(pay) desc) b 
+		) pre on esa.agentid = pre.agentid
+	left join (select 
+		x.agent_id,
+		ifnull(x.charged,0)/100 as charged,
+		ifnull(y.cost,0)/100 as cost,
+		(ifnull(x.charged,0) - ifnull(y.cost,0))/100 as balance
+	from (SELECT
+		agent_id,
+		SUM(point) as charged
+	FROM client_trans
+	WHERE `code` = 'PINPAI-CPC'
+		AND create_time &lt; @NEXTMONTH_START_DATE
+	group by agent_id) x
+	left outer join (SELECT
+		agent_id,
+		SUM(point_cost) as cost
+	FROM client_order
+	WHERE `code` = 'PINPAI-CPC'
+		AND create_time &lt; @NEXTMONTH_START_DATE
+	group by agent_id) y on x.agent_id = y.agent_id) ba on ba.agent_id = esa.agentid
+	where 	esa.statdate between @REPORT_START_DATE and @REPORT_END_DATE
+		and instr(ag.full_name,'测试') = 0 and ba.charged &gt;= 3500
+	group by
+		/* DATE_FORMAT(esa.statdate, '%Y-%m'), */
+		ag.agent_id,
+		ag.full_name,
+		ba.balance,
+		pre.pre_rank,
+		pre.impression,
+		pre.click,
+		pre.pay
+	order by sum(esa.pay) desc) a) aa
+group by aa.reportdate
+UNION ALL
+######扶翼全国代理商月度表现######
+select aa.*
+from (select
+		@ID := @ID + 1 as rank,
+		a.*
+	from (select
+		DATE_FORMAT(@REPORT_END_DATE, '%Y-%m') as reportdate,
+		ag.agent_id,
+		ag.full_name as agent_name,
+		ba.balance,
+		sum(esa.impression) as impression,
+		sum(esa.click) as click,
+		sum(esa.pay)/100 as pay,
+		sum(esa.pay)/@DAYCOUNT_OF_MONTH/100 as ARPU,
+		pre.pre_rank,
+		pre.impression as pre_impression,
+		pre.click as pre_click,
+		pre.pay as pre_pay
+	from `ea_stat_gender` esa
+	-- inner join client c on esa.clientid = c.client_id
+	inner join agent ag on esa.agentid = ag.agent_id and ag.full_name not in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE')
+	left join (select
+			@ID2 := @ID2 + 1 as pre_rank,
+			b.*
+		from (select 
+					agentid,
+					sum(impression) as impression,
+					sum(click) as click,
+					sum(pay)/100 as pay					
+				from `ea_stat_gender` esa
+				inner join agent ag on esa.agentid = ag.agent_id and ag.full_name not in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE')
+				where statdate between @PREMONTH_START_DATE and @PREMONTH_END_DATE
+				group by agentid order by sum(pay) desc) b 
+		) pre on esa.agentid = pre.agentid
+	left join (select 
+		x.agent_id,
+		ifnull(x.charged,0)/100 as charged,
+		ifnull(y.cost,0)/100 as cost,
+		(ifnull(x.charged,0) - ifnull(y.cost,0))/100 as balance
+	from (SELECT
+		agent_id,
+		SUM(point) as charged
+	FROM client_trans
+	WHERE `code` = 'PINPAI-CPC'
+		AND create_time &lt; @NEXTMONTH_START_DATE
+	group by agent_id) x
+	left outer join (SELECT
+		agent_id,
+		SUM(point_cost) as cost
+	FROM client_order
+	WHERE `code` = 'PINPAI-CPC'
+		AND create_time &lt; @NEXTMONTH_START_DATE
+	group by agent_id) y on x.agent_id = y.agent_id) ba on ba.agent_id = esa.agentid
+	where 	esa.statdate between @REPORT_START_DATE and @REPORT_END_DATE
+		and instr(ag.full_name,'测试') = 0 and ba.charged &gt;= 3500
+	group by
+		/* DATE_FORMAT(esa.statdate, '%Y-%m'), */
+		ag.agent_id,
+		ag.full_name,
+		ba.balance,
+		pre.pre_rank,
+		pre.impression,
+		pre.click,
+		pre.pay
+	order by sum(esa.pay) desc) a) aa
+where aa.agent_id = @AGENT_ID;
+
+###代理商按天业绩数据###
+select
+-- 	esa.agentid,
+-- 	ag.full_name as agent_name,
+	date.statdate,
+	ifnull(sum(impression),0) as impression,
+	ifnull(sum(click),0) as click,
+	ifnull(sum(pay)/100,0) as pay
+from (select distinct statdate
+		from `ea_stat_gender` esa
+		where esa.statdate between @REPORT_START_DATE and @REPORT_END_DATE) date
+left outer join `ea_stat_gender` esa on date.statdate = esa.statdate and esa.statdate between @REPORT_START_DATE and @REPORT_END_DATE and esa.agentid = @AGENT_ID
+group by date.statdate;
+
+
+
+###客户基本信息及当月业绩数据###
+set @ID = 0;
+set @ID2 = 0;
+select
+	@ID := @ID + 1 as rank,
+	a.*
+from (select
+-- 	esa.clientid,
+	case
+		when c.screen_name = '' then c.client_name
+		else c.screen_name
+	end as client_name,
+	DATE_FORMAT(c.create_time, '%Y-%m') as create_month, 
+	bal.balance,
+	sum(esa.impression) as impression,
+	sum(esa.click) as click,
+	sum(esa.pay)/100 as pay,
+	ifnull(pre.impression,'') as pre_impression,
+	ifnull(pre.click,'') as pre_click,
+	ifnull(pre.pay/100,'') as pre_pay,
+	ifnull(pre.pre_rank,'') as pre_rank
+from `ea_stat_gender` esa
+inner join client c on esa.clientid = c.client_id
+inner join industry ins on c.industry_id = ins.industry_id
+left join (select
+					@ID2:=@ID2 + 1 as pre_rank,
+					b.*
+				from (select
+								clientid,
+								sum(impression) as impression,
+								sum(click) as click,
+								sum(pay) as pay
+							from `ea_stat_gender`
+							where agentid = @AGENT_ID and statdate between @PREMONTH_START_DATE and @PREMONTH_END_DATE
+							group by clientid
+							order by sum(pay) desc)b 
+				) pre on esa.clientid = pre.clientid
+left join (select 
+					x.client_id,
+					ifnull(x.charged,0)/100 as charged,
+					ifnull(y.cost,0)/100 as cost,
+					(ifnull(x.charged,0) - ifnull(y.cost,0))/100 as balance
+				from (SELECT
+					`client_id`,
+					SUM(point) as charged
+				FROM client_trans
+				WHERE `code` = 'PINPAI-CPC' and agent_id = @AGENT_ID
+					AND create_time &lt; @NEXTMONTH_START_DATE
+				group by client_id) x
+				left outer join (SELECT
+					client_id,
+					SUM(point_cost) as cost
+				FROM client_order
+				WHERE `code` = 'PINPAI-CPC' and agent_id = @AGENT_ID
+					AND create_time &lt; @NEXTMONTH_START_DATE
+				group by client_id) y on x.client_id = y.client_id) bal on esa.clientid = bal.client_id
+where esa.agentid = @AGENT_ID and esa.statdate between @REPORT_START_DATE and @REPORT_END_DATE
+	and bal.charged &gt;= 3500
+group by
+-- 	esa.clientid,
+	case
+		when c.screen_name = '' then c.client_name
+		else c.screen_name
+	end,
+/* 	c.tel,
+	c.contact_name, */
+	DATE_FORMAT(c.create_time, '%Y-%m'),
+	bal.balance,
+	pre.impression,
+	pre.click,
+	pre.pay,
+	pre.pre_rank
+order by sum(esa.pay) desc ) a;
+
+###业绩分行业###
+select 
+	ins.name as industry_name,
+	sum(esa.pay)/100 as pay,
+	count(distinct esa.clientid) as clientcount
+from `ea_stat_gender` esa
+inner join client c on esa.clientid = c.client_id
+inner join industry ins on c.industry_id = ins.industry_id
+where esa.agentid = @AGENT_ID and esa.statdate between @REPORT_START_DATE and @REPORT_END_DATE
+group by ins.name
+
+###开户数量和客户数###
+select
+	ag.full_name as agent_name,
+-- 	c.client_id,
+	c.tel as contact_phone,
+	c.`contact_name`,
+	c.passport,
+	case
+		when c.screen_name = '' then c.client_name
+		else c.screen_name
+	end as client_name,
+	DATE_FORMAT(c.create_time, '%Y-%m') as create_month,
+	DATE_FORMAT(c.create_time, '%Y-%m-%d') as create_date,
+	ifnull(DATEDIFF(firstcost.first_cost_time, c.create_time),'') as firstcost_daynum,
+	bal.charged,
+	ifnull(cost.last_cost_day,'') as last_cost_day,
+	ifnull(DATEDIFF(@NEXTMONTH_START_DATE, cost.last_cost_day),999) as daycount_nocost,
+	ifnull(a.pay,'') as pay_current,
+	ceil(ifnull(a.pay/@DAYCOUNT_OF_MONTH,'')) as arpu,
+-- 	bal.cost,
+	bal.balance
+from client c
+inner join agent ag
+on c.agent_id = ag.agent_id and ag.agent_id = @AGENT_ID and c.status = 1 and c.pass_status = 1
+left outer join (select
+		esa.clientid,
+		sum(pay)/100 as pay
+	from `ea_stat_gender` esa
+	where esa.agentid = @AGENT_ID and esa.statdate between @REPORT_START_DATE and @REPORT_END_DATE
+	group by esa.clientid) a on a.clientid = c.client_id
+left join (select
+				co.client_id,
+				min(co.create_time) as first_cost_time
+			from client_order co
+			where co.agent_id = @AGENT_ID and co.code = 'PINPAI-CPC'
+			group by co.client_id) firstcost on firstcost.client_id = c.client_id
+left outer join (SELECT
+		co.client_id,
+		max(co.create_time) as last_cost_day
+	FROM client_order co
+	WHERE co.code = 'PINPAI-CPC' AND co.agent_id = @AGENT_ID AND co.create_time &lt; @NEXTMONTH_START_DATE
+	group by co.client_id) cost on cost.client_id = c.client_id
+left join (select 
+		x.client_id,
+		ifnull(x.charged,0)/100 as charged,
+		ifnull(y.cost,0)/100 as cost,
+		(ifnull(x.charged,0) - ifnull(y.cost,0))/100 as balance
+	from (SELECT
+		`client_id`,
+		SUM(point) as charged
+	FROM client_trans
+	WHERE `code` = 'PINPAI-CPC' and agent_id = @AGENT_ID
+		AND create_time &lt; @NEXTMONTH_START_DATE
+	group by client_id) x
+	left outer join (SELECT
+		client_id,
+		SUM(point_cost) as cost
+	FROM client_order
+	WHERE `code` = 'PINPAI-CPC' and agent_id = @AGENT_ID
+		AND create_time &lt; @NEXTMONTH_START_DATE
+	group by client_id) y on x.client_id = y.client_id) bal on c.client_id = bal.client_id
+where bal.charged &gt; 100
+order by c.create_time desc
+
+###全国开户及客户数量平均情况
+select
+	'全国平均',
+	avg(clientcount) as clientcount,
+	avg(clientcount_hascost) as clientcount_hascost,
+	avg(clientcount_new) as clientcount_new
+from (select
+				ag.full_name as agent_name,
+				count(distinct c.client_id) as clientcount,
+				count(case when ifnull(a.pay,0) &gt;0 then c.client_id else null end) as clientcount_hascost,
+				count(case when DATE_FORMAT(c.create_time, '%Y-%m') = DATE_FORMAT(@REPORT_START_DATE, '%Y-%m') then c.client_id else null end) as clientcount_new
+			from client c
+			inner join agent ag
+			on c.agent_id = ag.agent_id and c.status = 1 and c.pass_status = 1
+			left outer join (select
+					esa.clientid,
+					sum(pay)/100 as pay
+				from `ea_stat_gender` esa
+				where  esa.statdate between @REPORT_START_DATE and @REPORT_END_DATE
+				group by esa.clientid) a on a.clientid = c.client_id
+			left join (select 
+					x.client_id,
+					ifnull(x.charged,0)/100 as charged,
+					ifnull(y.cost,0)/100 as cost,
+					(ifnull(x.charged,0) - ifnull(y.cost,0))/100 as balance
+				from (SELECT
+					`client_id`,
+					SUM(point) as charged
+				FROM client_trans
+				WHERE `code` = 'PINPAI-CPC' 
+					AND create_time &lt; @NEXTMONTH_START_DATE
+				group by client_id) x
+				left outer join (SELECT
+					client_id,
+					SUM(point_cost) as cost
+				FROM client_order
+				WHERE `code` = 'PINPAI-CPC'
+					AND create_time &lt; @NEXTMONTH_START_DATE
+				group by client_id) y on x.client_id = y.client_id) bal on c.client_id = bal.client_id
+			where bal.charged &gt; 100 and ag.full_name not in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE')
+			group by ag.full_name ) a
+
+
+
+###待续费客户明细###
+select
+	case
+		when c.screen_name = '' then c.client_name
+		else c.screen_name
+	end as client_name,
+	bal.balance,
+	ceil(a.pay/@DAYCOUNT_OF_MONTH) as arpu,
+	round(bal.balance/(a.pay/@DAYCOUNT_OF_MONTH)) as day_left,
+	round(a.pay/@DAYCOUNT_OF_MONTH*10 - bal.balance) as suggest_charge,
+	c.tel as contact_phone,
+	c.`contact_name`,
+	c.passport
+from client c
+inner join agent ag
+on c.agent_id = ag.agent_id and ag.agent_id = @AGENT_ID and c.status = 1 and c.pass_status = 1
+left outer join (select
+		esa.clientid,
+		sum(pay)/100 as pay
+	from `ea_stat_gender` esa
+	where esa.agentid = @AGENT_ID and esa.statdate between @REPORT_START_DATE and @REPORT_END_DATE
+	group by esa.clientid) a on a.clientid = c.client_id
+left join (select 
+		x.client_id,
+		ifnull(x.charged,0)/100 as charged,
+		ifnull(y.cost,0)/100 as cost,
+		(ifnull(x.charged,0) - ifnull(y.cost,0))/100 as balance
+	from (SELECT
+		`client_id`,
+		SUM(point) as charged
+	FROM client_trans
+	WHERE `code` = 'PINPAI-CPC' and agent_id = @AGENT_ID
+		AND create_time &lt; @NEXTMONTH_START_DATE
+	group by client_id) x
+	left outer join (SELECT
+		client_id,
+		SUM(point_cost) as cost
+	FROM client_order
+	WHERE `code` = 'PINPAI-CPC' and agent_id = @AGENT_ID
+		AND create_time &lt; @NEXTMONTH_START_DATE
+	group by client_id) y on x.client_id = y.client_id) bal on c.client_id = bal.client_id
+where bal.charged &gt; 100 and bal.balance/(a.pay/@DAYCOUNT_OF_MONTH) &lt; 8
+order by bal.balance/(a.pay/@DAYCOUNT_OF_MONTH) asc
+
+###待唤醒客户明细###
+select
+	case
+		when c.screen_name = '' then c.client_name
+		else c.screen_name
+	end as client_name,
+	bal.balance,
+	ifnull(DATEDIFF(@NEXTMONTH_START_DATE, cost.last_cost_day),'从未消耗过') as daycount_nocost,
+	ifnull(cost.last_cost_day,'') as last_cost_day
+	c.tel as contact_phone,
+	c.`contact_name`,
+	c.passport
+from client c
+inner join agent ag
+on c.agent_id = ag.agent_id and ag.agent_id = @AGENT_ID and c.status = 1 and c.pass_status = 1
+left outer join (SELECT
+		co.client_id,
+		max(co.create_time) as last_cost_day
+	FROM client_order co
+	WHERE co.code = 'PINPAI-CPC' AND co.agent_id = @AGENT_ID AND co.create_time &lt; @NEXTMONTH_START_DATE
+	group by co.client_id) cost on cost.client_id = c.client_id
+left join (select 
+		x.client_id,
+		ifnull(x.charged,0)/100 as charged,
+		ifnull(y.cost,0)/100 as cost,
+		(ifnull(x.charged,0) - ifnull(y.cost,0))/100 as balance
+	from (SELECT
+		`client_id`,
+		SUM(point) as charged
+	FROM client_trans
+	WHERE `code` = 'PINPAI-CPC' and agent_id = @AGENT_ID
+		AND create_time &lt; @NEXTMONTH_START_DATE
+	group by client_id) x
+	left outer join (SELECT
+		client_id,
+		SUM(point_cost) as cost
+	FROM client_order
+	WHERE `code` = 'PINPAI-CPC' and agent_id = @AGENT_ID
+		AND create_time &lt; @NEXTMONTH_START_DATE
+	group by client_id) y on x.client_id = y.client_id) bal on c.client_id = bal.client_id
+where bal.charged &gt; 100 and ifnull(DATEDIFF(@NEXTMONTH_START_DATE, cost.last_cost_day),999) &gt; 30
+order by bal.balance desc
+
+###客户每日余额情况(计算欠费率)###
+-- SET @LAST_DAY = @NEXTMONTH_START_DATE;
+SET @LAST_DAY = DATE_ADD(@LAST_DAY, INTERVAL -1 day);
+select
+	DATE_ADD(@LAST_DAY, INTERVAL -1 day) as statdate,
+	case
+		when c.screen_name = '' then c.client_name
+		else c.screen_name
+	end as client_name,
+	bal.balance as current_balance,
+	pre_bal.balance as pre_balance
+from (select 
+			x.client_id,
+			(ifnull(x.charged,0) - ifnull(y.cost,0))/100 as balance
+		from (SELECT
+			`client_id`,
+			SUM(point) as charged
+		FROM client_trans
+		WHERE `code` = 'PINPAI-CPC' and agent_id = @AGENT_ID
+			AND create_time &lt; @LAST_DAY
+		group by client_id) x
+		left outer join (SELECT
+			client_id,
+			SUM(point_cost) as cost
+		FROM client_order
+		WHERE `code` = 'PINPAI-CPC' and agent_id = @AGENT_ID
+			AND create_time &lt; @LAST_DAY
+		group by client_id) y on x.client_id = y.client_id ) bal
+inner join client c on bal.client_id = c.client_id
+left join (select 
+				x.client_id,
+				(ifnull(x.charged,0) - ifnull(y.cost,0))/100 as balance
+			from (SELECT
+				`client_id`,
+				SUM(point) as charged
+			FROM client_trans
+			WHERE `code` = 'PINPAI-CPC' and agent_id = @AGENT_ID
+				AND create_time &lt; DATE_ADD(@LAST_DAY, INTERVAL -1 day)
+			group by client_id) x
+			left outer join (SELECT
+				client_id,
+				SUM(point_cost) as cost
+			FROM client_order
+			WHERE `code` = 'PINPAI-CPC' and agent_id = @AGENT_ID
+				AND create_time &lt; DATE_ADD(@LAST_DAY, INTERVAL -1 day)
+			group by client_id) y on x.client_id = y.client_id) pre_bal on bal.client_id = pre_bal.client_id
+			
+SET @DAYCOUNT_OF_PREMONTH = DATEDIFF(@REPORT_START_DATE,@PREMONTH_START_DATE );
+###上个月ARPU###
+select
+	case
+		when c.screen_name = '' then c.client_name
+		else c.screen_name
+	end as client_name,
+	ifnull(ceil(a.pay/@DAYCOUNT_OF_PREMONTH),0) as arpu
+from client c
+inner join agent ag
+on c.agent_id = ag.agent_id and ag.agent_id = @AGENT_ID and c.status = 1 and c.pass_status = 1
+left outer join (select
+		esa.clientid,
+		sum(pay)/100 as pay
+	from `ea_stat_gender` esa
+	where esa.agentid = @AGENT_ID and esa.statdate between @PREMONTH_START_DATE and @PREMONTH_END_DATE
+	group by esa.clientid) a on a.clientid = c.client_id
+left join (select 
+		x.client_id,
+		ifnull(x.charged,0)/100 as charged,
+		ifnull(y.cost,0)/100 as cost,
+		(ifnull(x.charged,0) - ifnull(y.cost,0))/100 as balance
+	from (SELECT
+		`client_id`,
+		SUM(point) as charged
+	FROM client_trans
+	WHERE `code` = 'PINPAI-CPC' and agent_id = @AGENT_ID
+		AND create_time &lt; @NEXTMONTH_START_DATE
+	group by client_id) x
+	left outer join (SELECT
+		client_id,
+		SUM(point_cost) as cost
+	FROM client_order
+	WHERE `code` = 'PINPAI-CPC' and agent_id = @AGENT_ID
+		AND create_time &lt; @NEXTMONTH_START_DATE
+	group by client_id) y on x.client_id = y.client_id) bal on c.client_id = bal.client_id
+where bal.charged &gt; 100 </string>
+			<key>table</key>
+			<string>industry</string>
+			<key>view</key>
+			<string>SP_VIEW_CUSTOMQUERY</string>
+			<key>windowVerticalDividerPosition</key>
+			<real>203</real>
+		</dict>
+	</dict>
+	<key>encrypted</key>
+	<false/>
+	<key>format</key>
+	<string>connection</string>
+	<key>queryFavorites</key>
+	<array/>
+	<key>queryHistory</key>
+	<array>
+		<string>select
+	'全国平均',
+	avg(clientcount) as clientcount,
+	avg(clientcount_hascost) as clientcount_hascost,
+	avg(clientcount_new) as clientcount_new
+from (select
+				ag.full_name as agent_name,
+				count(distinct c.client_id) as clientcount,
+				count(case when ifnull(a.pay,0) &gt;0 then c.client_id else null end) as clientcount_hascost,
+				count(case when DATE_FORMAT(c.create_time, '%Y-%m') = DATE_FORMAT(@REPORT_START_DATE, '%Y-%m') then c.client_id else null end) as clientcount_new
+			from client c
+			inner join agent ag
+			on c.agent_id = ag.agent_id and c.status = 1 and c.pass_status = 1
+			left outer join (select
+					esa.clientid,
+					sum(pay)/100 as pay
+				from `ea_stat_gender` esa
+				where  esa.statdate between @REPORT_START_DATE and @REPORT_END_DATE
+				group by esa.clientid) a on a.clientid = c.client_id
+			left join (select 
+					x.client_id,
+					ifnull(x.charged,0)/100 as charged,
+					ifnull(y.cost,0)/100 as cost,
+					(ifnull(x.charged,0) - ifnull(y.cost,0))/100 as balance
+				from (SELECT
+					`client_id`,
+					SUM(point) as charged
+				FROM client_trans
+				WHERE `code` = 'PINPAI-CPC' 
+					AND create_time &lt; @NEXTMONTH_START_DATE
+				group by client_id) x
+				left outer join (SELECT
+					client_id,
+					SUM(point_cost) as cost
+				FROM client_order
+				WHERE `code` = 'PINPAI-CPC'
+					AND create_time &lt; @NEXTMONTH_START_DATE
+				group by client_id) y on x.client_id = y.client_id) bal on c.client_id = bal.client_id
+			where bal.charged &gt; 100 and ag.full_name not in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE')
+			group by ag.full_name ) a</string>
+		<string>set @ID = 0;
+set @ID2 = 0;
+select
+	'-1' as rank,
+	aa.reportdate,
+	'' as agent_id,
+	'全国平均' as agent_name,
+	AVG(aa.balance) as balance,
+	AVG(aa.impression) as impression,
+	AVG(click) as click,
+	AVG(pay) as pay,
+	AVG(ARPU) as ARPU,
+	'-1' as pre_rank,
+	AVG(pre_impression) as pre_impression,
+	AVG(pre_click) as pre_click,
+	AVG(pre_pay) as pre_pay
+from (select
+		'1' as rank,
+		a.*
+	from (select
+		DATE_FORMAT(@REPORT_END_DATE, '%Y-%m') as reportdate,
+		ag.agent_id,
+		ag.full_name as agent_name,
+		ba.balance,
+		sum(esa.impression) as impression,
+		sum(esa.click) as click,
+		sum(esa.pay)/100 as pay,
+		sum(esa.pay)/@DAYCOUNT_OF_MONTH/100 as ARPU,
+		pre.pre_rank,
+		pre.impression as pre_impression,
+		pre.click as pre_click,
+		pre.pay as pre_pay
+	from `ea_stat_gender` esa
+	-- inner join client c on esa.clientid = c.client_id
+	inner join agent ag on esa.agentid = ag.agent_id and ag.full_name not in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE')
+	left join (select
+			'1' as pre_rank,
+			b.*
+		from (select 
+					agentid,
+					sum(impression) as impression,
+					sum(click) as click,
+					sum(pay)/100 as pay
+				from `ea_stat_gender` esa
+				inner join agent ag on esa.agentid = ag.agent_id and ag.full_name not in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE')
+				where statdate between @PREMONTH_START_DATE and @PREMONTH_END_DATE
+				group by agentid order by sum(pay) desc) b 
+		) pre on esa.agentid = pre.agentid
+	left join (select 
+		x.agent_id,
+		ifnull(x.charged,0)/100 as charged,
+		ifnull(y.cost,0)/100 as cost,
+		(ifnull(x.charged,0) - ifnull(y.cost,0))/100 as balance
+	from (SELECT
+		agent_id,
+		SUM(point) as charged
+	FROM client_trans
+	WHERE `code` = 'PINPAI-CPC'
+		AND create_time &lt; @NEXTMONTH_START_DATE
+	group by agent_id) x
+	left outer join (SELECT
+		agent_id,
+		SUM(point_cost) as cost
+	FROM client_order
+	WHERE `code` = 'PINPAI-CPC'
+		AND create_time &lt; @NEXTMONTH_START_DATE
+	group by agent_id) y on x.agent_id = y.agent_id) ba on ba.agent_id = esa.agentid
+	where 	esa.statdate between @REPORT_START_DATE and @REPORT_END_DATE
+		and instr(ag.full_name,'测试') = 0 and ba.charged &gt;= 3500
+	group by
+		/* DATE_FORMAT(esa.statdate, '%Y-%m'), */
+		ag.agent_id,
+		ag.full_name,
+		ba.balance,
+		pre.pre_rank,
+		pre.impression,
+		pre.click,
+		pre.pay
+	order by sum(esa.pay) desc) a) aa
+group by aa.reportdate
+UNION ALL
+######扶翼全国代理商月度表现######
+select aa.*
+from (select
+		@ID := @ID + 1 as rank,
+		a.*
+	from (select
+		DATE_FORMAT(@REPORT_END_DATE, '%Y-%m') as reportdate,
+		ag.agent_id,
+		ag.full_name as agent_name,
+		ba.balance,
+		sum(esa.impression) as impression,
+		sum(esa.click) as click,
+		sum(esa.pay)/100 as pay,
+		sum(esa.pay)/@DAYCOUNT_OF_MONTH/100 as ARPU,
+		pre.pre_rank,
+		pre.impression as pre_impression,
+		pre.click as pre_click,
+		pre.pay as pre_pay
+	from `ea_stat_gender` esa
+	-- inner join client c on esa.clientid = c.client_id
+	inner join agent ag on esa.agentid = ag.agent_id and ag.full_name not in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE')
+	left join (select
+			@ID2 := @ID2 + 1 as pre_rank,
+			b.*
+		from (select 
+					agentid,
+					sum(impression) as impression,
+					sum(click) as click,
+					sum(pay)/100 as pay					
+				from `ea_stat_gender` esa
+				inner join agent ag on esa.agentid = ag.agent_id and ag.full_name not in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE')
+				where statdate between @PREMONTH_START_DATE and @PREMONTH_END_DATE
+				group by agentid order by sum(pay) desc) b 
+		) pre on esa.agentid = pre.agentid
+	left join (select 
+		x.agent_id,
+		ifnull(x.charged,0)/100 as charged,
+		ifnull(y.cost,0)/100 as cost,
+		(ifnull(x.charged,0) - ifnull(y.cost,0))/100 as balance
+	from (SELECT
+		agent_id,
+		SUM(point) as charged
+	FROM client_trans
+	WHERE `code` = 'PINPAI-CPC'
+		AND create_time &lt; @NEXTMONTH_START_DATE
+	group by agent_id) x
+	left outer join (SELECT
+		agent_id,
+		SUM(point_cost) as cost
+	FROM client_order
+	WHERE `code` = 'PINPAI-CPC'
+		AND create_time &lt; @NEXTMONTH_START_DATE
+	group by agent_id) y on x.agent_id = y.agent_id) ba on ba.agent_id = esa.agentid
+	where 	esa.statdate between @REPORT_START_DATE and @REPORT_END_DATE
+		and instr(ag.full_name,'测试') = 0 and ba.charged &gt;= 3500
+	group by
+		/* DATE_FORMAT(esa.statdate, '%Y-%m'), */
+		ag.agent_id,
+		ag.full_name,
+		ba.balance,
+		pre.pre_rank,
+		pre.impression,
+		pre.click,
+		pre.pay
+	order by sum(esa.pay) desc) a) aa
+where aa.agent_id = @AGENT_ID</string>
+		<string>SET @REPORT_START_DATE = '2014-02-01';
+SET @REPORT_END_DATE='2014-02-28';
+SET @PREMONTH_START_DATE = DATE_ADD(@REPORT_START_DATE, INTERVAL -1 MONTH);
+SET @PREMONTH_END_DATE = DATE_ADD(@REPORT_START_DATE, INTERVAL -1 DAY);
+SET @NEXTMONTH_START_DATE = DATE_ADD(@REPORT_END_DATE, INTERVAL 1 DAY);
+SET @DAYCOUNT_OF_MONTH = DATEDIFF(DATE_ADD(@REPORT_START_DATE, interval 1 month), @REPORT_START_DATE);
+SET @AGENT_ID = (SELECT agent_id FROM agent ag WHERE ag.full_name = '厦门龙商网络技术服务有限公司' )</string>
+		<string>select
+	case
+		when c.screen_name = '' then c.client_name
+		else c.screen_name
+	end as client_name,
+	bal.balance,
+	ceil(a.pay/@DAYCOUNT_OF_MONTH) as arpu,
+	round(bal.balance/(a.pay/@DAYCOUNT_OF_MONTH)) as day_left,
+	round(a.pay/@DAYCOUNT_OF_MONTH*10 - bal.balance) as suggest_charge,
+	c.tel as contact_phone,
+	c.`contact_name`,
+	c.passport
+from client c
+inner join agent ag
+on c.agent_id = ag.agent_id and ag.agent_id = @AGENT_ID and c.status = 1 and c.pass_status = 1
+left outer join (select
+		esa.clientid,
+		sum(pay)/100 as pay
+	from `ea_stat_gender` esa
+	where esa.agentid = @AGENT_ID and esa.statdate between @REPORT_START_DATE and @REPORT_END_DATE
+	group by esa.clientid) a on a.clientid = c.client_id
+left join (select 
+		x.client_id,
+		ifnull(x.charged,0)/100 as charged,
+		ifnull(y.cost,0)/100 as cost,
+		(ifnull(x.charged,0) - ifnull(y.cost,0))/100 as balance
+	from (SELECT
+		`client_id`,
+		SUM(point) as charged
+	FROM client_trans
+	WHERE `code` = 'PINPAI-CPC' and agent_id = @AGENT_ID
+		AND create_time &lt; @NEXTMONTH_START_DATE
+	group by client_id) x
+	left outer join (SELECT
+		client_id,
+		SUM(point_cost) as cost
+	FROM client_order
+	WHERE `code` = 'PINPAI-CPC' and agent_id = @AGENT_ID
+		AND create_time &lt; @NEXTMONTH_START_DATE
+	group by client_id) y on x.client_id = y.client_id) bal on c.client_id = bal.client_id
+where bal.charged &gt; 100 and bal.balance/(a.pay/@DAYCOUNT_OF_MONTH) &lt; 8
+order by bal.balance/(a.pay/@DAYCOUNT_OF_MONTH) asc</string>
+		<string>select
+	'全国平均',
+	avg(clientcount) as clientcount,
+	avg(clientcount_hascost) as clientcount_hascost,
+	avg(clientcount_new) as clientcount_new
+from (select
+				ag.full_name as agent_name,
+				count(distinct c.client_id) as clientcount,
+				count(case when ifnull(a.pay,0) &gt;0 then c.client_id else null end) as clientcount_hascost,
+				count(case when DATE_FORMAT(c.create_time, '%Y-%m') = DATE_FORMAT(@REPORT_START_DATE, '%Y-%m') then c.client_id else null end) as clientcount_new
+			from client c
+			inner join agent ag
+			on c.agent_id = ag.agent_id and c.status = 1 and c.pass_status = 1
+			left outer join (select
+					esa.clientid,
+					sum(pay)/100 as pay
+				from `ea_stat_gender` esa
+				where  esa.statdate between @REPORT_START_DATE and @REPORT_END_DATE
+				group by esa.clientid) a on a.clientid = c.client_id
+			left join (select 
+					x.client_id,
+					ifnull(x.charged,0)/100 as charged,
+					ifnull(y.cost,0)/100 as cost,
+					(ifnull(x.charged,0) - ifnull(y.cost,0))/100 as balance
+				from (SELECT
+					`client_id`,
+					SUM(point) as charged
+				FROM client_trans
+				WHERE `code` = 'PINPAI-CPC' 
+					AND create_time &lt; @NEXTMONTH_START_DATE
+				group by client_id) x
+				left outer join (SELECT
+					client_id,
+					SUM(point_cost) as cost
+				FROM client_order
+				WHERE `code` = 'PINPAI-CPC'
+					AND create_time &lt; @NEXTMONTH_START_DATE
+				group by client_id) y on x.client_id = y.client_id) bal on c.client_id = bal.client_id
+			where bal.charged &gt; 100 and ag.full_name not in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司')
+			group by ag.full_name ) a</string>
+		<string>select
+	ag.full_name as agent_name,
+-- 	c.client_id,
+	c.tel as contact_phone,
+	c.`contact_name`,
+	c.passport,
+	case
+		when c.screen_name = '' then c.client_name
+		else c.screen_name
+	end as client_name,
+	DATE_FORMAT(c.create_time, '%Y-%m') as create_month,
+	DATE_FORMAT(c.create_time, '%Y-%m-%d') as create_date,
+	ifnull(DATEDIFF(firstcost.first_cost_time, c.create_time),'') as firstcost_daynum,
+	bal.charged,
+	ifnull(cost.last_cost_day,'') as last_cost_day,
+	ifnull(DATEDIFF(@NEXTMONTH_START_DATE, cost.last_cost_day),999) as daycount_nocost,
+	ifnull(a.pay,'') as pay_current,
+	ceil(ifnull(a.pay/@DAYCOUNT_OF_MONTH,'')) as arpu,
+-- 	bal.cost,
+	bal.balance
+from client c
+inner join agent ag
+on c.agent_id = ag.agent_id and ag.agent_id = @AGENT_ID and c.status = 1 and c.pass_status = 1
+left outer join (select
+		esa.clientid,
+		sum(pay)/100 as pay
+	from `ea_stat_gender` esa
+	where esa.agentid = @AGENT_ID and esa.statdate between @REPORT_START_DATE and @REPORT_END_DATE
+	group by esa.clientid) a on a.clientid = c.client_id
+left join (select
+				co.client_id,
+				min(co.create_time) as first_cost_time
+			from client_order co
+			where co.agent_id = @AGENT_ID and co.code = 'PINPAI-CPC'
+			group by co.client_id) firstcost on firstcost.client_id = c.client_id
+left outer join (SELECT
+		co.client_id,
+		max(co.create_time) as last_cost_day
+	FROM client_order co
+	WHERE co.code = 'PINPAI-CPC' AND co.agent_id = @AGENT_ID AND co.create_time &lt; @NEXTMONTH_START_DATE
+	group by co.client_id) cost on cost.client_id = c.client_id
+left join (select 
+		x.client_id,
+		ifnull(x.charged,0)/100 as charged,
+		ifnull(y.cost,0)/100 as cost,
+		(ifnull(x.charged,0) - ifnull(y.cost,0))/100 as balance
+	from (SELECT
+		`client_id`,
+		SUM(point) as charged
+	FROM client_trans
+	WHERE `code` = 'PINPAI-CPC' and agent_id = @AGENT_ID
+		AND create_time &lt; @NEXTMONTH_START_DATE
+	group by client_id) x
+	left outer join (SELECT
+		client_id,
+		SUM(point_cost) as cost
+	FROM client_order
+	WHERE `code` = 'PINPAI-CPC' and agent_id = @AGENT_ID
+		AND create_time &lt; @NEXTMONTH_START_DATE
+	group by client_id) y on x.client_id = y.client_id) bal on c.client_id = bal.client_id
+where bal.charged &gt; 100
+order by c.create_time desc</string>
+		<string>select 
+	ins.name as industry_name,
+	sum(esa.pay)/100 as pay,
+	count(distinct esa.clientid) as clientcount
+from `ea_stat_gender` esa
+inner join client c on esa.clientid = c.client_id
+inner join industry ins on c.industry_id = ins.industry_id
+where esa.agentid = @AGENT_ID and esa.statdate between @REPORT_START_DATE and @REPORT_END_DATE
+group by ins.name</string>
+		<string>set @ID = 0;
+set @ID2 = 0;
+select
+	@ID := @ID + 1 as rank,
+	a.*
+from (select
+-- 	esa.clientid,
+	case
+		when c.screen_name = '' then c.client_name
+		else c.screen_name
+	end as client_name,
+	DATE_FORMAT(c.create_time, '%Y-%m') as create_month, 
+	bal.balance,
+	sum(esa.impression) as impression,
+	sum(esa.click) as click,
+	sum(esa.pay)/100 as pay,
+	ifnull(pre.impression,'') as pre_impression,
+	ifnull(pre.click,'') as pre_click,
+	ifnull(pre.pay/100,'') as pre_pay,
+	ifnull(pre.pre_rank,'') as pre_rank
+from `ea_stat_gender` esa
+inner join client c on esa.clientid = c.client_id
+inner join industry ins on c.industry_id = ins.industry_id
+left join (select
+					@ID2:=@ID2 + 1 as pre_rank,
+					b.*
+				from (select
+								clientid,
+								sum(impression) as impression,
+								sum(click) as click,
+								sum(pay) as pay
+							from `ea_stat_gender`
+							where agentid = @AGENT_ID and statdate between @PREMONTH_START_DATE and @PREMONTH_END_DATE
+							group by clientid
+							order by sum(pay) desc)b 
+				) pre on esa.clientid = pre.clientid
+left join (select 
+					x.client_id,
+					ifnull(x.charged,0)/100 as charged,
+					ifnull(y.cost,0)/100 as cost,
+					(ifnull(x.charged,0) - ifnull(y.cost,0))/100 as balance
+				from (SELECT
+					`client_id`,
+					SUM(point) as charged
+				FROM client_trans
+				WHERE `code` = 'PINPAI-CPC' and agent_id = @AGENT_ID
+					AND create_time &lt; @NEXTMONTH_START_DATE
+				group by client_id) x
+				left outer join (SELECT
+					client_id,
+					SUM(point_cost) as cost
+				FROM client_order
+				WHERE `code` = 'PINPAI-CPC' and agent_id = @AGENT_ID
+					AND create_time &lt; @NEXTMONTH_START_DATE
+				group by client_id) y on x.client_id = y.client_id) bal on esa.clientid = bal.client_id
+where esa.agentid = @AGENT_ID and esa.statdate between @REPORT_START_DATE and @REPORT_END_DATE
+	and bal.charged &gt;= 3500
+group by
+-- 	esa.clientid,
+	case
+		when c.screen_name = '' then c.client_name
+		else c.screen_name
+	end,
+/* 	c.tel,
+	c.contact_name, */
+	DATE_FORMAT(c.create_time, '%Y-%m'),
+	bal.balance,
+	pre.impression,
+	pre.click,
+	pre.pay,
+	pre.pre_rank
+order by sum(esa.pay) desc ) a</string>
+		<string>select
+-- 	esa.agentid,
+-- 	ag.full_name as agent_name,
+	date.statdate,
+	ifnull(sum(impression),0) as impression,
+	ifnull(sum(click),0) as click,
+	ifnull(sum(pay)/100,0) as pay
+from (select distinct statdate
+		from `ea_stat_gender` esa
+		where esa.statdate between @REPORT_START_DATE and @REPORT_END_DATE) date
+left outer join `ea_stat_gender` esa on date.statdate = esa.statdate and esa.statdate between @REPORT_START_DATE and @REPORT_END_DATE and esa.agentid = @AGENT_ID
+group by date.statdate</string>
+		<string>select
+-- 	esa.agentid,
+-- 	ag.full_name as agent_name,
+	date.statdate,
+	ifnull(sum(impression),0) as impression,
+	ifnull(sum(click),0) as click,
+	ifnull(sum(pay))/100,0) as pay
+from (select distinct statdate
+		from `ea_stat_gender` esa
+		where esa.statdate between @REPORT_START_DATE and @REPORT_END_DATE) date
+left outer join `ea_stat_gender` esa on date.statdate = esa.statdate and esa.statdate between @REPORT_START_DATE and @REPORT_END_DATE and esa.agentid = @AGENT_ID
+group by date.statdate</string>
+		<string>select
+-- 	esa.agentid,
+-- 	ag.full_name as agent_name,
+	date.statdate,
+	ifnull(sum(impression),0) as impression,
+	ifnull(sum(click),0) as click,
+	ifnull(sum(pay))/100 as pay
+from (select distinct statdate
+		from `ea_stat_gender` esa
+		where esa.statdate between @REPORT_START_DATE and @REPORT_END_DATE) date
+left outer join `ea_stat_gender` esa on date.statdate = esa.statdate and esa.statdate between @REPORT_START_DATE and @REPORT_END_DATE and esa.agentid = @AGENT_ID
+group by date.statdate</string>
+		<string>select
+-- 	esa.agentid,
+-- 	ag.full_name as agent_name,
+	date.statdate,
+	sum(impression) as impression,
+	sum(click) as click,
+	sum(pay)/100 as pay
+from (select distinct statdate
+		from `ea_stat_gender` esa
+		where esa.statdate between @REPORT_START_DATE and @REPORT_END_DATE) date
+left outer join `ea_stat_gender` esa on date.statdate = esa.statdate and esa.statdate between @REPORT_START_DATE and @REPORT_END_DATE and esa.agentid = @AGENT_ID
+group by date.statdate</string>
+		<string>select
+-- 	esa.agentid,
+-- 	ag.full_name as agent_name,
+	date.statdate,
+	sum(impression) as impression,
+	sum(click) as click,
+	sum(pay)/100 as pay
+from (select distinct statdate
+		from `ea_stat_gender` esa
+		where esa.statdate between @REPORT_START_DATE and @REPORT_END_DATE) date
+left outer join `ea_stat_gender` esa on date.statdate = esa.statdate and esa.statdate between @REPORT_START_DATE and @REPORT_END_DATE
+inner join agent ag on esa.agentid = ag.agent_id and ag.agent_id = @AGENT_ID
+group by date.statdate</string>
+		<string>###代理商按天业绩数据###
+select
+-- 	esa.agentid,
+-- 	ag.full_name as agent_name,
+	date.statdate,
+	sum(impression) as impression,
+	sum(click) as click,
+	sum(pay)/100 as pay
+from (select distinct statdate
+		from `ea_stat_gender` esa
+		where esa.statdate between @REPORT_START_DATE and @REPORT_END_DATE) date
+left outer join `ea_stat_gender` esa on date.statdate = esa.statdate and esa.statdate between @REPORT_START_DATE and @REPORT_END_DATE
+-- inner join agent ag on esa.agentid = ag.agent_id and ag.agent_id = @AGENT_ID
+group by date.statdate</string>
+		<string>select
+-- 	esa.agentid,
+	ag.full_name as agent_name,
+	date.statdate,
+	sum(impression) as impression,
+	sum(click) as click,
+	sum(pay)/100 as pay
+from (select distinct statdate
+		from `ea_stat_gender` esa
+		where esa.statdate between @REPORT_START_DATE and @REPORT_END_DATE) date
+left outer join `ea_stat_gender` esa on date.statdate = esa.statdate and esa.statdate between @REPORT_START_DATE and @REPORT_END_DATE
+inner join agent ag on esa.agentid = ag.agent_id and ag.agent_id = @AGENT_ID
+group by esa.agentid,ag.full_name,date.statdate</string>
+		<string>select
+-- 	esa.agentid,
+	ag.full_name as agent_name,
+	date.statdate,
+	sum(impression) as impression,
+	sum(click) as click,
+	sum(pay)/100 as pay
+from (select distinct statdate
+		from `ea_stat_gender` esa
+		where esa.statdate between @REPORT_START_DATE and @REPORT_END_DATE) date
+left outer join `ea_stat_gender` esa on date.statdate = esa.statdate
+inner join agent ag on esa.agentid = ag.agent_id and ag.agent_id = @AGENT_ID
+where esa.statdate between @REPORT_START_DATE and @REPORT_END_DATE
+group by esa.agentid,ag.full_name,date.statdate</string>
+		<string>select distinct statdate
+from `ea_stat_gender` esa
+where esa.statdate between @REPORT_START_DATE and @REPORT_END_DATE</string>
+		<string>select
+-- 	esa.agentid,
+	ag.full_name as agent_name,
+	esa.statdate,
+	sum(impression) as impression,
+	sum(click) as click,
+	sum(pay)/100 as pay
+from `ea_stat_gender` esa
+inner join agent ag on esa.agentid = ag.agent_id and ag.agent_id = @AGENT_ID
+where esa.statdate between @REPORT_START_DATE and @REPORT_END_DATE
+group by esa.agentid,ag.full_name,esa.statdate</string>
+		<string>set @ID = 0;
+set @ID2 = 0;
+select
+	'-1' as rank,
+	aa.reportdate,
+	'' as agent_id,
+	'全国平均' as agent_name,
+	AVG(aa.balance) as balance,
+	AVG(aa.impression) as impression,
+	AVG(click) as click,
+	AVG(pay) as pay,
+	AVG(ARPU) as ARPU,
+	'-1' as pre_rank,
+	AVG(pre_impression) as pre_impression,
+	AVG(pre_click) as pre_click,
+	AVG(pre_pay) as pre_pay
+from (select
+		'1' as rank,
+		a.*
+	from (select
+		DATE_FORMAT(@REPORT_END_DATE, '%Y-%m') as reportdate,
+		ag.agent_id,
+		ag.full_name as agent_name,
+		ba.balance,
+		sum(esa.impression) as impression,
+		sum(esa.click) as click,
+		sum(esa.pay)/100 as pay,
+		sum(esa.pay)/@DAYCOUNT_OF_MONTH/100 as ARPU,
+		pre.pre_rank,
+		pre.impression as pre_impression,
+		pre.click as pre_click,
+		pre.pay as pre_pay
+	from `ea_stat_gender` esa
+	-- inner join client c on esa.clientid = c.client_id
+	inner join agent ag on esa.agentid = ag.agent_id and ag.full_name not in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司')
+	left join (select
+			'1' as pre_rank,
+			b.*
+		from (select 
+					agentid,
+					sum(impression) as impression,
+					sum(click) as click,
+					sum(pay)/100 as pay
+				from `ea_stat_gender` esa
+				inner join agent ag on esa.agentid = ag.agent_id and ag.full_name not in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司')
+				where statdate between @PREMONTH_START_DATE and @PREMONTH_END_DATE
+				group by agentid order by sum(pay) desc) b 
+		) pre on esa.agentid = pre.agentid
+	left join (select 
+		x.agent_id,
+		ifnull(x.charged,0)/100 as charged,
+		ifnull(y.cost,0)/100 as cost,
+		(ifnull(x.charged,0) - ifnull(y.cost,0))/100 as balance
+	from (SELECT
+		agent_id,
+		SUM(point) as charged
+	FROM client_trans
+	WHERE `code` = 'PINPAI-CPC'
+		AND create_time &lt; @NEXTMONTH_START_DATE
+	group by agent_id) x
+	left outer join (SELECT
+		agent_id,
+		SUM(point_cost) as cost
+	FROM client_order
+	WHERE `code` = 'PINPAI-CPC'
+		AND create_time &lt; @NEXTMONTH_START_DATE
+	group by agent_id) y on x.agent_id = y.agent_id) ba on ba.agent_id = esa.agentid
+	where 	esa.statdate between @REPORT_START_DATE and @REPORT_END_DATE
+		and instr(ag.full_name,'测试') = 0 and ba.charged &gt;= 3500
+	group by
+		/* DATE_FORMAT(esa.statdate, '%Y-%m'), */
+		ag.agent_id,
+		ag.full_name,
+		ba.balance,
+		pre.pre_rank,
+		pre.impression,
+		pre.click,
+		pre.pay
+	order by sum(esa.pay) desc) a) aa
+group by aa.reportdate
+UNION ALL
+######扶翼全国代理商月度表现######
+select aa.*
+from (select
+		@ID := @ID + 1 as rank,
+		a.*
+	from (select
+		DATE_FORMAT(@REPORT_END_DATE, '%Y-%m') as reportdate,
+		ag.agent_id,
+		ag.full_name as agent_name,
+		ba.balance,
+		sum(esa.impression) as impression,
+		sum(esa.click) as click,
+		sum(esa.pay)/100 as pay,
+		sum(esa.pay)/@DAYCOUNT_OF_MONTH/100 as ARPU,
+		pre.pre_rank,
+		pre.impression as pre_impression,
+		pre.click as pre_click,
+		pre.pay as pre_pay
+	from `ea_stat_gender` esa
+	-- inner join client c on esa.clientid = c.client_id
+	inner join agent ag on esa.agentid = ag.agent_id and ag.full_name not in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司')
+	left join (select
+			@ID2 := @ID2 + 1 as pre_rank,
+			b.*
+		from (select 
+					agentid,
+					sum(impression) as impression,
+					sum(click) as click,
+					sum(pay)/100 as pay					
+				from `ea_stat_gender` esa
+				inner join agent ag on esa.agentid = ag.agent_id and ag.full_name not in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司')
+				where statdate between @PREMONTH_START_DATE and @PREMONTH_END_DATE
+				group by agentid order by sum(pay) desc) b 
+		) pre on esa.agentid = pre.agentid
+	left join (select 
+		x.agent_id,
+		ifnull(x.charged,0)/100 as charged,
+		ifnull(y.cost,0)/100 as cost,
+		(ifnull(x.charged,0) - ifnull(y.cost,0))/100 as balance
+	from (SELECT
+		agent_id,
+		SUM(point) as charged
+	FROM client_trans
+	WHERE `code` = 'PINPAI-CPC'
+		AND create_time &lt; @NEXTMONTH_START_DATE
+	group by agent_id) x
+	left outer join (SELECT
+		agent_id,
+		SUM(point_cost) as cost
+	FROM client_order
+	WHERE `code` = 'PINPAI-CPC'
+		AND create_time &lt; @NEXTMONTH_START_DATE
+	group by agent_id) y on x.agent_id = y.agent_id) ba on ba.agent_id = esa.agentid
+	where 	esa.statdate between @REPORT_START_DATE and @REPORT_END_DATE
+		and instr(ag.full_name,'测试') = 0 and ba.charged &gt;= 3500
+	group by
+		/* DATE_FORMAT(esa.statdate, '%Y-%m'), */
+		ag.agent_id,
+		ag.full_name,
+		ba.balance,
+		pre.pre_rank,
+		pre.impression,
+		pre.click,
+		pre.pay
+	order by sum(esa.pay) desc) a) aa
+where aa.agent_id = @AGENT_ID</string>
+		<string>SET @REPORT_START_DATE = '2014-02-01';
+SET @REPORT_END_DATE='2014-02-28';
+SET @PREMONTH_START_DATE = DATE_ADD(@REPORT_START_DATE, INTERVAL -1 MONTH);
+SET @PREMONTH_END_DATE = DATE_ADD(@REPORT_START_DATE, INTERVAL -1 DAY);
+SET @NEXTMONTH_START_DATE = DATE_ADD(@REPORT_END_DATE, INTERVAL 1 DAY);
+SET @DAYCOUNT_OF_MONTH = DATEDIFF(DATE_ADD(@REPORT_START_DATE, interval 1 month), @REPORT_START_DATE);
+SET @AGENT_ID = (SELECT agent_id FROM agent ag WHERE ag.full_name = '来客创新（北京）科技发展有限公司');
+SELECT @REPORT_START_DATE,@REPORT_END_DATE,@PREMONTH_START_DATE,@PREMONTH_END_DATE,@DAYCOUNT_OF_MONTH,@AGENT_ID</string>
+	</array>
+	<key>rdbms_type</key>
+	<string>mysql</string>
+	<key>rdbms_version</key>
+	<string>5.5.12-log</string>
+	<key>version</key>
+	<integer>1</integer>
+</dict>
+</plist>

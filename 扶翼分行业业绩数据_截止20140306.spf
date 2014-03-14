@@ -1,0 +1,412 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>ContentFilters</key>
+	<dict/>
+	<key>auto_connect</key>
+	<true/>
+	<key>data</key>
+	<dict>
+		<key>connection</key>
+		<dict>
+			<key>database</key>
+			<string>gina</string>
+			<key>host</key>
+			<string>s3760i.mars.grid.sina.com.cn</string>
+			<key>kcid</key>
+			<string>8421912374166567031</string>
+			<key>name</key>
+			<string>扶翼粉丝通DB</string>
+			<key>port</key>
+			<integer>3760</integer>
+			<key>rdbms_type</key>
+			<string>mysql</string>
+			<key>sslCACertFileLocation</key>
+			<string></string>
+			<key>sslCACertFileLocationEnabled</key>
+			<integer>0</integer>
+			<key>sslCertificateFileLocation</key>
+			<string></string>
+			<key>sslCertificateFileLocationEnabled</key>
+			<integer>0</integer>
+			<key>sslKeyFileLocation</key>
+			<string></string>
+			<key>sslKeyFileLocationEnabled</key>
+			<integer>0</integer>
+			<key>type</key>
+			<string>SPTCPIPConnection</string>
+			<key>useSSL</key>
+			<integer>0</integer>
+			<key>user</key>
+			<string>gina_mis</string>
+		</dict>
+		<key>session</key>
+		<dict>
+			<key>connectionEncoding</key>
+			<string>utf8</string>
+			<key>contentPageNumber</key>
+			<integer>1</integer>
+			<key>contentSelection</key>
+			<data>
+			YnBsaXN0MDDUAQIDBAUGNjdYJHZlcnNpb25YJG9iamVjdHNZJGFy
+			Y2hpdmVyVCR0b3ASAAGGoK0HCBUWFxgZHSQoLDA0VSRudWxs0wkK
+			CwwQFFdOUy5rZXlzWk5TLm9iamVjdHNWJGNsYXNzow0OD4ACgAOA
+			BKMREhOABYAGgAiADFR0eXBlVHJvd3NUa2V5c18QJlNlbGVjdGlv
+			bkRldGFpbFR5cGVQcmltYXJ5S2V5ZWREZXRhaWxz0wkKCxobHKCg
+			gAfSHh8gIVokY2xhc3NuYW1lWCRjbGFzc2VzXxATTlNNdXRhYmxl
+			RGljdGlvbmFyeaMgIiNcTlNEaWN0aW9uYXJ5WE5TT2JqZWN00goL
+			JSehJoAJgAvSCykqK1lOUy5zdHJpbmeACltpbmR1c3RyeV9pZNIe
+			Hy0uXxAPTlNNdXRhYmxlU3RyaW5noy0vI1hOU1N0cmluZ9IeHzEy
+			Xk5TTXV0YWJsZUFycmF5ozEzI1dOU0FycmF50h4fIjWiIiNfEA9O
+			U0tleWVkQXJjaGl2ZXLRODlUZGF0YYABAAgAEQAaACMALQAyADcA
+			RQBLAFIAWgBlAGwAcAByAHQAdgB6AHwAfgCAAIIAhwCMAJEAugDB
+			AMIAwwDFAMoA1QDeAPQA+AEFAQ4BEwEVARcBGQEeASgBKgE2ATsB
+			TQFRAVoBXwFuAXIBegF/AYIBlAGXAZwAAAAAAAACAQAAAAAAAAA6
+			AAAAAAAAAAAAAAAAAAABng==
+			</data>
+			<key>contentSortColIsAsc</key>
+			<true/>
+			<key>contentViewport</key>
+			<string>{{0, 0}, {693, 456}}</string>
+			<key>isToolbarVisible</key>
+			<true/>
+			<key>queries</key>
+			<string>select
+	ag.full_name as agent_name,
+	case
+		when ag.full_name in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE') then 'KA'
+		else 'SME'
+	end as agent_type,
+	c.client_name,
+	c.screen_name,
+	ins.name as industry_name,
+	sum(esa.impression) 展示量,
+	sum(esa.click) 点击量,
+	sum(esa.pay)/100 as 消耗点数,
+	ifnull(rc.收入本金,0)/100 as 收入本金
+from `ea_stat_gender` esa
+inner join client c on esa.clientid = c.client_id
+inner join agent ag on esa.agentid = ag.agent_id
+inner join industry ins on c.industry_id = ins.industry_id
+left join (SELECT
+					crd.client_id,
+					SUM(clickcost) 消耗金额,
+					SUM(confirm_cost) 收入本金
+				FROM client_resbacklog_day crd
+				inner join client c on crd.client_id = c.client_id
+				inner join agent ag on c.agent_id = ag.agent_id
+				WHERE service_line_code = 'PINPAI-CPC' AND logdate between '2014-01-01' and '2014-03-06'
+				group by crd.client_id) rc on esa.clientid = rc.client_id
+where esa.statdate between '2014-01-01' and '2014-03-06'
+group by
+	ag.full_name,
+	case
+		when ag.full_name in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE') then 'KA'
+		else 'SME'
+	end,
+	c.client_name,
+	c.screen_name,ins.name,ifnull(rc.收入本金,0)
+	
+</string>
+			<key>table</key>
+			<string>industry</string>
+			<key>view</key>
+			<string>SP_VIEW_CUSTOMQUERY</string>
+			<key>windowVerticalDividerPosition</key>
+			<real>203</real>
+		</dict>
+	</dict>
+	<key>encrypted</key>
+	<false/>
+	<key>format</key>
+	<string>connection</string>
+	<key>queryFavorites</key>
+	<array/>
+	<key>queryHistory</key>
+	<array>
+		<string>select
+	ag.full_name as agent_name,
+	case
+		when ag.full_name in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE') then 'KA'
+		else 'SME'
+	end as agent_type,
+	c.client_name,
+	c.screen_name,
+	ins.name as industry_name,
+	sum(esa.impression) 展示量,
+	sum(esa.click) 点击量,
+	sum(esa.pay)/100 as 消耗点数,
+	ifnull(rc.收入本金,0)/100 as 收入本金
+from `ea_stat_gender` esa
+inner join client c on esa.clientid = c.client_id
+inner join agent ag on esa.agentid = ag.agent_id
+inner join industry ins on c.industry_id = ins.industry_id
+left join (SELECT
+					crd.client_id,
+					SUM(clickcost) 消耗金额,
+					SUM(confirm_cost) 收入本金
+				FROM client_resbacklog_day crd
+				inner join client c on crd.client_id = c.client_id
+				inner join agent ag on c.agent_id = ag.agent_id
+				WHERE service_line_code = 'PINPAI-CPC' AND logdate between '2014-01-01' and '2014-03-06'
+				group by crd.client_id) rc on esa.clientid = rc.client_id
+where esa.statdate between '2014-01-01' and '2014-03-06'
+group by
+	ag.full_name,
+	case
+		when ag.full_name in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE') then 'KA'
+		else 'SME'
+	end,
+	c.client_name,
+	c.screen_name,ins.name,ifnull(rc.收入本金,0)</string>
+		<string>select
+	ag.full_name as agent_name,
+	case
+		when ag.full_name in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE') then 'KA'
+		else 'SME'
+	end as agent_type,
+	c.client_name,
+	c.screen_name,
+	ins.name as industry_name,
+	sum(esa.impression) 展示量,
+	sum(esa.click) 点击量,
+	sum(esa.pay)/100 as 消耗点数,
+	ifnull(rc.收入本金,0) as 收入本金
+from `ea_stat_gender` esa
+inner join client c on esa.clientid = c.client_id
+inner join agent ag on esa.agentid = ag.agent_id
+inner join industry ins on c.industry_id = ins.industry_id
+left join (SELECT
+					crd.client_id,
+					SUM(clickcost) 消耗金额,
+					SUM(confirm_cost) 收入本金
+				FROM client_resbacklog_day crd
+				inner join client c on crd.client_id = c.client_id
+				inner join agent ag on c.agent_id = ag.agent_id
+				WHERE service_line_code = 'PINPAI-CPC' AND logdate between '2014-01-01' and '2014-03-06'
+				group by crd.client_id) rc on esa.clientid = rc.client_id
+where esa.statdate between '2014-01-01' and '2014-03-06'
+group by
+	ag.full_name,
+	case
+		when ag.full_name in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE') then 'KA'
+		else 'SME'
+	end,
+	c.client_name,
+	c.screen_name,ins.name,ifnull(rc.收入本金,0)</string>
+		<string>SELECT
+	crd.client_id,
+	SUM(clickcost) 消耗金额,
+	SUM(confirm_cost) 收入本金
+FROM client_resbacklog_day crd
+inner join client c on crd.client_id = c.client_id
+inner join agent ag on c.agent_id = ag.agent_id
+WHERE service_line_code = 'PINPAI-CPC' AND logdate between '2014-01-01' and '2014-03-06'
+group by crd.client_id</string>
+		<string>select
+	ag.full_name as agent_name,
+	case
+		when ag.full_name in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE') then 'KA'
+		else 'SME'
+	end as agent_type,
+	c.client_name,
+	c.screen_name,
+	ins.name as industry_name,
+	sum(esa.impression) 展示量,
+	sum(esa.click) 点击量,
+	sum(esa.pay)/100 as 消耗点数
+from `ea_stat_gender` esa
+inner join client c on esa.clientid = c.client_id
+inner join agent ag on esa.agentid = ag.agent_id
+inner join industry ins on c.industry_id = ins.industry_id
+where esa.statdate between '2014-01-01' and '2014-03-06'
+group by
+	ag.full_name,
+	case
+		when ag.full_name in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE') then 'KA'
+		else 'SME'
+	end,
+	c.client_name,
+	c.screen_name,ins.name</string>
+		<string>select
+	case
+		when ag.full_name in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE') then 'KA'
+		else 'SME'
+	end as agent_type,
+	ag.full_name as agent_name,
+	c.client_name,
+	c.screen_name,
+	ins.name as industry_name,
+	sum(esa.pay)/100 as 消耗点数
+from `ea_stat_gender` esa
+inner join client c on esa.clientid = c.client_id
+inner join agent ag on esa.agentid = ag.agent_id
+inner join industry ins on c.industry_id = ins.industry_id
+where esa.statdate between '2014-01-01' and '2014-03-06'
+group by
+	case
+		when ag.full_name in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE') then 'KA'
+		else 'SME'
+	end,
+	ag.full_name,
+	c.client_name,
+	c.screen_name,ins.name</string>
+		<string>select
+	case
+		when ag.full_name in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE') then 'KA'
+		else 'SME'
+	end as agent_type,
+	ag.full_name as agent_name,
+	c.client_name,
+	c.screen_name,
+	ins.name as industry_name,
+	sum(esa.pay)/100 as 消耗点数
+from `ea_stat_gender` esa
+inner join client c on esa.clientid = c.client_id
+inner join agent ag on esa.agentid = ag.agent_id
+inner join industry ins on c.industry_id = ins.industry_id
+where esa.statdate between '2014-01-01' and '2014-03-06'
+group by
+	case
+		when ag.full_name in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE') then 'KA'
+		else 'SME'
+	end
+	ag.full_name,
+	c.client_name,
+	c.screen_name,ins.name</string>
+		<string>select
+	ag.full_name as agent_name,
+	c.client_name,
+	c.screen_name,
+	ins.name as industry_name,
+	sum(esa.pay)/100 as 消耗点数
+from `ea_stat_gender` esa
+inner join client c on esa.clientid = c.client_id
+inner join agent ag on esa.agentid = ag.agent_id
+inner join industry ins on c.industry_id = ins.industry_id
+where esa.statdate between '2014-01-01' and '2014-03-06'
+group by
+	ag.full_name,
+	c.client_name,
+	c.screen_name,ins.name</string>
+		<string>select
+	ag.full_name as agent_name,
+	c.client_name,
+	c.screen_name,
+	ins.name as industry_name,
+	sum(esa.pay)/100 as 消耗点数
+from `ea_stat_gender` esa
+inner join client c on esa.clientid = c.client_id
+inner join agent ag on esa.agentid = ag.agent_id
+inner join industry ins on c.industry_id = ins.industry_id
+where esa.statdate between '2014-01-01' and '2014-03-02'
+group by
+	ag.full_name,
+	c.client_name,
+	c.screen_name,ins.name</string>
+		<string>select
+	c.client_name,
+	c.screen_name,
+	ins.name as industry_name,
+	sum(esa.pay)/100 as 消耗点数
+from `ea_stat_gender` esa
+inner join client c on esa.clientid = c.client_id
+inner join industry ins on c.industry_id = ins.industry_id
+where esa.statdate between '2014-01-01' and '2014-03-02'
+group by
+	c.client_name,
+	c.screen_name,ins.name</string>
+		<string>select
+	c.client_name,
+	c.screen_name,
+	sum(esa.pay)/100 as 消耗点数
+from `ea_stat_gender` esa
+inner join client c on esa.clientid = c.client_id
+where esa.statdate between '2014-01-01' and '2014-03-02'
+group by
+	c.client_name,
+	c.screen_name</string>
+		<string>SET @REPORT_START_DATE = '2014-02-01';
+SET @REPORT_END_DATE='2014-02-28';
+SET @PREMONTH_START_DATE = DATE_ADD(@REPORT_START_DATE, INTERVAL -1 MONTH);
+SET @PREMONTH_END_DATE = DATE_ADD(@REPORT_START_DATE, INTERVAL -1 DAY);
+SET @NEXTMONTH_START_DATE = DATE_ADD(@REPORT_END_DATE, INTERVAL 1 DAY);
+SET @DAYCOUNT_OF_MONTH = DATEDIFF(DATE_ADD(@REPORT_START_DATE, interval 1 month), @REPORT_START_DATE);
+SET @AGENT_ID = (SELECT agent_id FROM agent ag WHERE ag.full_name = '厦门龙商网络技术服务有限公司')</string>
+		<string>select 
+	statmonth,
+	count(distinct client_id) as clientcount_hascost,
+	statmonth+"-01"
+from (select
+	DATE_FORMAT(wr.statdate, '%Y-%m') as statmonth,
+	agent_name,
+	client_id,
+	case
+		when screen_name = '' then client_name
+		else screen_name
+	end as client_name,
+	sum(pv) as pv,
+	sum(iv) as iv,
+	sum(f_consume) as cost
+from weibo_report wr
+where statdate between '2013-10-01' and '2013-12-31' 
+group by
+	DATE_FORMAT(wr.statdate, '%Y-%m'),
+	agent_name,
+	client_id,
+	case
+		when screen_name = '' then client_name
+		else screen_name
+	end
+having sum(f_consume) &gt; 0 ) a
+group by statmonth</string>
+		<string>select c.client_name,c.screen_name,a.full_name
+from client c
+inner join agent a on c.agent_id = a.agent_id
+where c.client_id = '8acc86dd4242607b0142544c2dc9156d'</string>
+		<string>select c.client_name,c.screen_name,a.full_name
+from client c
+inner join agent a on c.agent_id = a.agent_id
+where c.client_name = '恒赐纹身艺术工作室1'</string>
+		<string>select c.client_name,c.screen_name,a.full_name
+from client c
+inner join agent a on c.agent_id = a.agent_id
+where c.screen_name = '恒赐纹身艺术工作室'</string>
+		<string>select c.client_name,c.screen_name,a.full_name
+from client c
+inner join agent a on c.client_id = a.client_id
+where client_id = '8acc86dd4242607b0142544c2dc9156d'</string>
+		<string>select c.client_name,c.screen_name,a.agent_name
+from client c
+inner join agent a on c.client_id = a.client_id
+where client_id = '8acc86dd4242607b0142544c2dc9156d'</string>
+		<string>select *
+from client
+where client_id = '8acc86dd4242607b0142544c2dc9156d'</string>
+		<string>select
+	client_id,
+	case
+		when screen_name = '' then client_name
+		else screen_name
+	end as screen_name,
+	sum(f_consume) as pay
+from weibo_report
+where statdate between '2013-12-01' and '2013-12-31' and client_id = '8acc86dd4242607b0142544c2dc9156d'
+group by client_id,case
+		when screen_name = '' then client_name
+		else screen_name
+	end</string>
+		<string>select sum(point_cost)
+from client_order
+where client_id = '8acc86dd4242607b0142544c2dc9156d'
+and create_time between '2013-12-01' and '2013-12-31 23:59:59'</string>
+	</array>
+	<key>rdbms_type</key>
+	<string>mysql</string>
+	<key>rdbms_version</key>
+	<string>5.5.12-log</string>
+	<key>version</key>
+	<integer>1</integer>
+</dict>
+</plist>

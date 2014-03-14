@@ -1,0 +1,745 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>ContentFilters</key>
+	<dict/>
+	<key>auto_connect</key>
+	<true/>
+	<key>data</key>
+	<dict>
+		<key>connection</key>
+		<dict>
+			<key>database</key>
+			<string>gina</string>
+			<key>host</key>
+			<string>s3760i.mars.grid.sina.com.cn</string>
+			<key>kcid</key>
+			<string>8421912374166567031</string>
+			<key>name</key>
+			<string>扶翼粉丝通DB</string>
+			<key>port</key>
+			<integer>3760</integer>
+			<key>rdbms_type</key>
+			<string>mysql</string>
+			<key>sslCACertFileLocation</key>
+			<string></string>
+			<key>sslCACertFileLocationEnabled</key>
+			<integer>0</integer>
+			<key>sslCertificateFileLocation</key>
+			<string></string>
+			<key>sslCertificateFileLocationEnabled</key>
+			<integer>0</integer>
+			<key>sslKeyFileLocation</key>
+			<string></string>
+			<key>sslKeyFileLocationEnabled</key>
+			<integer>0</integer>
+			<key>type</key>
+			<string>SPTCPIPConnection</string>
+			<key>useSSL</key>
+			<integer>0</integer>
+			<key>user</key>
+			<string>gina_mis</string>
+		</dict>
+		<key>session</key>
+		<dict>
+			<key>connectionEncoding</key>
+			<string>utf8</string>
+			<key>contentPageNumber</key>
+			<integer>1</integer>
+			<key>contentSelection</key>
+			<data>
+			YnBsaXN0MDDUAQIDBAUGJCVYJHZlcnNpb25YJG9iamVjdHNZJGFy
+			Y2hpdmVyVCR0b3ASAAGGoKgHCBMUFRYaIVUkbnVsbNMJCgsMDxJX
+			TlMua2V5c1pOUy5vYmplY3RzViRjbGFzc6INDoACgAOiEBGABIAF
+			gAdUdHlwZVRyb3dzXxAdU2VsZWN0aW9uRGV0YWlsVHlwZU5TSW5k
+			ZXhTZXTSFwsYGVxOU1JhbmdlQ291bnQQAIAG0hscHR5aJGNsYXNz
+			bmFtZVgkY2xhc3Nlc1pOU0luZGV4U2V0oh8gWk5TSW5kZXhTZXRY
+			TlNPYmplY3TSGxwiI1xOU0RpY3Rpb25hcnmiIiBfEA9OU0tleWVk
+			QXJjaGl2ZXLRJidUZGF0YYABAAgAEQAaACMALQAyADcAQABGAE0A
+			VQBgAGcAagBsAG4AcQBzAHUAdwB8AIEAoQCmALMAtQC3ALwAxwDQ
+			ANsA3gDpAPIA9wEEAQcBGQEcASEAAAAAAAACAQAAAAAAAAAoAAAA
+			AAAAAAAAAAAAAAABIw==
+			</data>
+			<key>contentSortColIsAsc</key>
+			<true/>
+			<key>contentViewport</key>
+			<string>{{0, 0}, {693, 456}}</string>
+			<key>isToolbarVisible</key>
+			<true/>
+			<key>queries</key>
+			<string>SET @START_DATE = '2014-03-10';
+SET @END_DATE = '2014-03-16';
+SET @PRE_START_DATE = DATE_ADD(@START_DATE, INTERVAL -7 DAY);
+SET @PRE_END_DATE = DATE_ADD(@END_DATE, INTERVAL -7 DAY);
+SET @Q_START_DATE = DATE_ADD(LAST_DAY(MAKEDATE(EXTRACT(YEAR FROM @END_DATE),1) + interval QUARTER(@END_DATE)*3-4 month), INTERVAL 1 day);
+SET @YEAR_START_DATE = DATE_SUB(@END_DATE,INTERVAL dayofyear(@END_DATE)-1 DAY);
+-- SELECT @START_DATE,@END_DATE,@PRE_START_DATE,@PRE_END_DATE,@Q_START_DATE,@YEAR_START_DATE
+
+select
+	statdate,
+	case
+		when ag.full_name in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE') then 'KA'
+		else 'SME'
+	end as agent_type,
+	count(distinct c.passport) as clientnum,
+	sum(esa.impression) as impression,
+	sum(esa.click) as click,
+	sum(esa.pay)/100 as cost
+from `ea_stat_adpos` esa
+inner join client c on esa.clientid = c.client_id
+inner join agent ag on esa.agentid = ag.agent_id 
+inner join industry ins on c.industry_id = ins.`industry_id`
+where statdate between @START_DATE and @END_DATE and esa.pay &gt; 0
+group by
+	statdate,
+	case
+		when ag.full_name in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE') then 'KA'
+		else 'SME'
+	end
+
+select
+	statdate,
+	case
+		when ag.full_name in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE') then 'KA'
+		else 'SME'
+	end as agent_type,
+	sum(esa.impression) as impression,
+	sum(esa.click) as click,
+	sum(esa.pay)/100 as cost
+from `ea_stat_adpos` esa
+inner join client c on esa.clientid = c.client_id
+inner join agent ag on esa.agentid = ag.agent_id 
+inner join industry ins on c.industry_id = ins.`industry_id`
+where statdate between '2014-03-03' and '2014-03-09'
+-- where statdate between '2014-02-24' and '2014-03-02'
+group by
+	statdate,
+	case
+		when ag.full_name in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE') then 'KA'
+		else 'SME'
+	end
+SELECT
+	SUM(clickcost) 消耗金额,
+	SUM(confirm_cost) 收入本金
+FROM client_resbacklog_day crd
+inner join client c on crd.client_id = c.client_id
+inner join agent ag on c.agent_id = ag.agent_id
+WHERE service_line_code = 'WEIBO-CPC' AND logdate = '2014-03-02'
+select
+	sum(pv),
+	sum(iv),
+	sum(d_consume),
+	sum(f_consume)
+from weibo_report
+where statdate = '2014-03-02'
+select
+	sum(d_consume),
+	sum(f_consume)
+from weibo_report
+where statdate = '2014-03-02'
+SELECT
+	case
+		when ag.full_name in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE') then 'KA'
+		else 'SME'
+	end as agent_type,
+	SUM(clickcost)/100 消耗金额,
+	SUM(confirm_cost)/100 收入本金
+FROM client_resbacklog_day crd
+inner join client c on crd.client_id = c.client_id
+inner join agent ag on c.agent_id = ag.agent_id
+WHERE service_line_code = 'PINPAI-CPC' AND logdate between '2014-01-01' and '2014-03-02'
+GROUP BY
+	case
+		when ag.full_name in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE') then 'KA'
+		else 'SME'
+	end
+SELECT
+	SUM(clickcost) 消耗金额,
+	SUM(confirm_cost) 收入本金
+FROM client_resbacklog_day crd
+inner join client c on crd.client_id = c.client_id
+inner join agent ag on c.agent_id = ag.agent_id
+WHERE service_line_code = 'PINPAI-CPC' AND logdate between '2014-01-01' and '2014-03-02'
+SELECT
+	SUM(clickcost)/100 消耗金额,
+	SUM(confirm_cost)/100 收入本金
+FROM client_resbacklog_day crd
+inner join client c on crd.client_id = c.client_id
+inner join agent ag on c.agent_id = ag.agent_id
+WHERE service_line_code = 'PINPAI-CPC' AND logdate between '2014-01-01' and '2014-03-02'
+SELECT
+	case
+		when ag.full_name in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE') then 'KA'
+		else 'SME'
+	end as agent_type,
+	SUM(clickcost) 消耗点数,
+	SUM(confirm_cost)/100 收入本金
+FROM client_resbacklog_day crd
+inner join client c on crd.client_id = c.client_id
+inner join agent ag on c.agent_id = ag.agent_id
+WHERE service_line_code = 'PINPAI-CPC' AND logdate between '2014-01-01' and '2014-03-02'
+GROUP BY
+	case
+		when ag.full_name in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE') then 'KA'
+		else 'SME'
+	end
+SELECT
+	case
+		when ag.full_name in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE') then 'KA'
+		else 'SME'
+	end as agent_type,
+	SUM(clickcost) 消耗点数,
+	SUM(confirm_cost) 收入本金
+FROM client_resbacklog_day crd
+inner join client c on crd.client_id = c.client_id
+inner join agent ag on c.agent_id = ag.agent_id
+WHERE service_line_code = 'PINPAI-CPC' AND logdate between '2014-01-01' and '2014-03-02'
+GROUP BY
+	case
+		when ag.full_name in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE') then 'KA'
+		else 'SME'
+	end
+
+
+select
+	bal.agent_type,
+	bal.agent_name,
+	bal.balance,
+	ifnull(cost.本周日均消耗,0) as 本周日均消耗
+from (select 
+	x.agent_id,
+	case
+		when ag.full_name in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE') then 'KA'
+		else 'SME'
+	end as agent_type,
+	ag.full_name as agent_name,
+	ifnull(x.charged,0)/100 as charged,
+	ifnull(y.cost,0)/100 as cost,
+	(ifnull(x.charged,0) - ifnull(y.cost,0))/100 as balance
+from (SELECT
+	agent_id,
+	SUM(point) as charged
+FROM client_trans
+WHERE `code` = 'PINPAI-CPC'
+	AND create_time &amp;lt; '2014-03-03 00:00:00'
+group by agent_id) x
+inner join agent ag on x.agent_id = ag.agent_id and instr(ag.full_name,'测试') = 0 and ag.status = 1
+left outer join (SELECT
+	agent_id,
+	SUM(point_cost) as cost
+FROM client_order
+WHERE `code` = 'PINPAI-CPC'
+	AND create_time &amp;lt; '2014-03-03 00:00:00'
+group by agent_id) y on x.agent_id = y.agent_id) bal
+left outer join (select
+							ag.full_name,
+							ag.agent_id,
+							sum(esa.pay)/100 as pay,
+							sum(esa.pay)/100/7 as 本周日均消耗
+						from `ea_stat_adpos` esa
+						inner join client c on esa.clientid = c.client_id
+						inner join agent ag on esa.agentid = ag.agent_id 
+						where statdate between '2014-02-24' and '2014-03-02'
+						group by
+							ag.full_name,ag.agent_id) cost on bal.agent_id = cost.agent_id
+where bal.balance &amp;gt; 0 or ifnull(cost.本周日均消耗,0) &amp;gt; 0
+select
+	bal.agent_type,
+	bal.agent_name,
+	bal.balance,
+	ifnull(cost.本周日均消耗,0) as 本周日均消耗
+from (select 
+	x.agent_id,
+	case
+		when ag.full_name in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE') then 'KA'
+		else 'SME'
+	end as agent_type,
+	ag.full_name as agent_name,
+	ifnull(x.charged,0)/100 as charged,
+	ifnull(y.cost,0)/100 as cost,
+	(ifnull(x.charged,0) - ifnull(y.cost,0))/100 as balance
+from (SELECT
+	agent_id,
+	SUM(point) as charged
+FROM client_trans
+WHERE `code` = 'PINPAI-CPC'
+	AND create_time &amp;lt; '2014-03-03 00:00:00'
+group by agent_id) x
+inner join agent ag on x.agent_id = ag.agent_id and instr(ag.full_name,'测试') = 0 and ag.status = 1
+left outer join (SELECT
+	agent_id,
+	SUM(point_cost) as cost
+FROM client_order
+WHERE `code` = 'PINPAI-CPC'
+	AND create_time &amp;lt; '2014-03-03 00:00:00'
+group by agent_id) y on x.agent_id = y.agent_id) bal
+left outer join (select
+							ag.full_name,
+							ag.agent_id,
+							sum(esa.pay)/100 as pay,
+							sum(esa.pay)/100/7 as 本周日均消耗
+						from `ea_stat_adpos` esa
+						inner join client c on esa.clientid = c.client_id
+						inner join agent ag on esa.agentid = ag.agent_id 
+						where statdate between '2014-02-24' and '2014-03-02'
+						group by
+							ag.full_name,ag.agent_id) cost on bal.agent_id = cost.agent_id
+where bal.balance = 0 and ifnull(cost.本周日均消耗,0) = 0
+select
+	bal.agent_type,
+	bal.agent_name,
+	bal.balance,
+	ifnull(cost.本周日均消耗,0) as 本周日均消耗
+from (select 
+	x.agent_id,
+	case
+		when ag.full_name in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE') then 'KA'
+		else 'SME'
+	end as agent_type,
+	ag.full_name as agent_name,
+	ifnull(x.charged,0)/100 as charged,
+	ifnull(y.cost,0)/100 as cost,
+	(ifnull(x.charged,0) - ifnull(y.cost,0))/100 as balance
+from (SELECT
+	agent_id,
+	SUM(point) as charged
+FROM client_trans
+WHERE `code` = 'PINPAI-CPC'
+	AND create_time &amp;lt; '2014-03-03 00:00:00'
+group by agent_id) x
+inner join agent ag on x.agent_id = ag.agent_id and instr(ag.full_name,'测试') = 0 and ag.status = 1
+left outer join (SELECT
+	agent_id,
+	SUM(point_cost) as cost
+FROM client_order
+WHERE `code` = 'PINPAI-CPC'
+	AND create_time &amp;lt; '2014-03-03 00:00:00'
+group by agent_id) y on x.agent_id = y.agent_id) bal
+left outer join (select
+							ag.full_name,
+							ag.agent_id,
+							sum(esa.pay)/100 as pay,
+							sum(esa.pay)/100/7 as 本周日均消耗
+						from `ea_stat_adpos` esa
+						inner join client c on esa.clientid = c.client_id
+						inner join agent ag on esa.agentid = ag.agent_id 
+						where statdate between '2014-02-24' and '2014-03-02'
+						group by
+							ag.full_name,ag.agent_id) cost on bal.agent_id = cost.agent_id
+select
+	bal.agent_type,
+	bal.agent_name,
+	bal.balance,
+	ifnull(cost.本周日均消耗,0) as 本周日均消耗
+from (select 
+	x.agent_id,
+	case
+		when ag.full_name in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE') then 'KA'
+		else 'SME'
+	end as agent_type,
+	ag.full_name as agent_name,
+	ifnull(x.charged,0)/100 as charged,
+	ifnull(y.cost,0)/100 as cost,
+	(ifnull(x.charged,0) - ifnull(y.cost,0))/100 as balance
+from (SELECT
+	agent_id,
+	SUM(point) as charged
+FROM client_trans
+WHERE `code` = 'PINPAI-CPC'
+	AND create_time &amp;lt; '2014-03-03 00:00:00'
+group by agent_id) x
+inner join agent ag on x.agent_id = ag.agent_id and instr(ag.full_name,'测试') = 0
+left outer join (SELECT
+	agent_id,
+	SUM(point_cost) as cost
+FROM client_order
+WHERE `code` = 'PINPAI-CPC'
+	AND create_time &amp;lt; '2014-03-03 00:00:00'
+group by agent_id) y on x.agent_id = y.agent_id) bal
+left outer join (select
+							ag.full_name,
+							ag.agent_id,
+							sum(esa.pay)/100 as pay,
+							sum(esa.pay)/100/7 as 本周日均消耗
+						from `ea_stat_adpos` esa
+						inner join client c on esa.clientid = c.client_id
+						inner join agent ag on esa.agentid = ag.agent_id 
+						where statdate between '2014-02-24' and '2014-03-02'
+						group by
+							ag.full_name,ag.agent_id) cost on bal.agent_id = cost.agent_id
+select
+	bal.agent_type,
+	bal.agent_name,
+	bal.balance,
+	cost.本周日均消耗
+from (select 
+	x.agent_id,
+	case
+		when ag.full_name in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE') then 'KA'
+		else 'SME'
+	end as agent_type,
+	ag.full_name as agent_name,
+	ifnull(x.charged,0)/100 as charged,
+	ifnull(y.cost,0)/100 as cost,
+	(ifnull(x.charged,0) - ifnull(y.cost,0))/100 as balance
+from (SELECT
+	agent_id,
+	SUM(point) as charged
+FROM client_trans
+WHERE `code` = 'PINPAI-CPC'
+	AND create_time &amp;lt; '2014-03-03 00:00:00'
+group by agent_id) x
+inner join agent ag on x.agent_id = ag.agent_id and instr(ag.full_name,'测试') = 0
+left outer join (SELECT
+	agent_id,
+	SUM(point_cost) as cost
+FROM client_order
+WHERE `code` = 'PINPAI-CPC'
+	AND create_time &amp;lt; '2014-03-03 00:00:00'
+group by agent_id) y on x.agent_id = y.agent_id) bal
+left outer join (select
+							ag.full_name,
+							ag.agent_id,
+							sum(esa.pay)/100 as pay,
+							sum(esa.pay)/100/7 as 本周日均消耗
+						from `ea_stat_adpos` esa
+						inner join client c on esa.clientid = c.client_id
+						inner join agent ag on esa.agentid = ag.agent_id 
+						where statdate between '2014-02-24' and '2014-03-02'
+						group by
+							ag.full_name,ag.agent_id) cost on bal.agent_id = cost.agent_id</string>
+			<key>view</key>
+			<string>SP_VIEW_CUSTOMQUERY</string>
+			<key>windowVerticalDividerPosition</key>
+			<real>203</real>
+		</dict>
+	</dict>
+	<key>encrypted</key>
+	<false/>
+	<key>format</key>
+	<string>connection</string>
+	<key>queryFavorites</key>
+	<array/>
+	<key>queryHistory</key>
+	<array>
+		<string>select
+	statdate,
+	case
+		when ag.full_name in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE') then 'KA'
+		else 'SME'
+	end as agent_type,
+	count(distinct c.passport) as clientnum,
+	sum(esa.impression) as impression,
+	sum(esa.click) as click,
+	sum(esa.pay)/100 as cost
+from `ea_stat_adpos` esa
+inner join client c on esa.clientid = c.client_id
+inner join agent ag on esa.agentid = ag.agent_id 
+inner join industry ins on c.industry_id = ins.`industry_id`
+where statdate between @START_DATE and @END_DATE and esa.pay &gt; 0
+group by
+	statdate,
+	case
+		when ag.full_name in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE') then 'KA'
+		else 'SME'
+	end</string>
+		<string>select
+	statdate,
+	case
+		when ag.full_name in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE') then 'KA'
+		else 'SME'
+	end as agent_type,
+	count(distinct c.passport) as clientnum,
+	sum(esa.impression) as impression,
+	sum(esa.click) as click,
+	sum(esa.pay)/100 as cost
+from `ea_stat_adpos` esa
+inner join client c on esa.clientid = c.client_id
+inner join agent ag on esa.agentid = ag.agent_id 
+inner join industry ins on c.industry_id = ins.`industry_id`
+where statdate between @START_DATE and @END_DATE and esa.pay &amp;gt</string>
+		<string>SET @START_DATE = '2014-03-10';
+SET @END_DATE = '2014-03-16';
+SET @PRE_START_DATE = DATE_ADD(@START_DATE, INTERVAL -7 DAY);
+SET @PRE_END_DATE = DATE_ADD(@END_DATE, INTERVAL -7 DAY);
+SET @Q_START_DATE = DATE_ADD(LAST_DAY(MAKEDATE(EXTRACT(YEAR FROM @END_DATE),1) + interval QUARTER(@END_DATE)*3-4 month), INTERVAL 1 day);
+SET @YEAR_START_DATE = DATE_SUB(@END_DATE,INTERVAL dayofyear(@END_DATE)-1 DAY);
+SELECT @START_DATE,@END_DATE,@PRE_START_DATE,@PRE_END_DATE,@Q_START_DATE,@YEAR_START_DATE</string>
+		<string>SET @START_DATE = '2014-03-10';
+SET @END_DATE = '2014-03-16';
+SET @PRE_START_DATE = DATE_ADD(@START_DATE, INTERVAL -7 DAY);
+SET @PRE_END_DATE = DATE_ADD(@END_DATE, INTERVAL -7 DAY);
+SET @Q_START_DATE = (select DATE_ADD(LAST_DAY(MAKEDATE(EXTRACT(YEAR FROM @START_DATE),1) + interval QUARTER(@START_DATE)*3-4 month), INTERVAL 1 day));
+SELECT @START_DATE,@END_DATE,@PRE_START_DATE,@PRE_END_DATE,@Q_START_DATE</string>
+		<string>SET @START_DATE = '2014-03-10';
+SET @END_DATE = '2014-03-16';
+SET @PRE_START_DATE = DATE_ADD(@START_DATE, INTERVAL -7 DAY);
+SET @PRE_END_DATE = DATE_ADD(@END_DATE, INTERVAL -7 DAY);
+SET @Q_START_DATE = (select DATE_ADD(LAST_DAY(MAKEDATE(EXTRACT(YEAR FROM @DATE),1) + interval QUARTER(@DATE)*3-4 month), INTERVAL 1 day));
+SELECT @START_DATE,@END_DATE,@PRE_START_DATE,@PRE_END_DATE,@Q_START_DATE</string>
+		<string>SET @START_DATE = '2014-03-10';
+SET @END_DATE = '2014-03-16';
+SET @PRE_START_DATE = DATE_ADD(@START_DATE, INTERVAL -7 DAY);
+SET @PRE_END_DATE = DATE_ADD(@END_DATE, INTERVAL -7 DAY);
+SELECT @START_DATE,@END_DATE,@PRE_START_DATE,@PRE_END_DATE</string>
+		<string>select
+	statdate,
+	case
+		when ag.full_name in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE') then 'KA'
+		else 'SME'
+	end as agent_type,
+	count(distinct c.passport) as clientnum,
+	sum(esa.impression) as impression,
+	sum(esa.click) as click,
+	sum(esa.pay)/100 as cost
+from `ea_stat_adpos` esa
+inner join client c on esa.clientid = c.client_id
+inner join agent ag on esa.agentid = ag.agent_id 
+inner join industry ins on c.industry_id = ins.`industry_id`
+where statdate between '2014-03-03' and '2014-03-09' and esa.pay &gt; 0
+-- where statdate between '2014-02-24' and '2014-03-02' and esa.pay &gt; 0
+group by
+	statdate,
+	case
+		when ag.full_name in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE') then 'KA'
+		else 'SME'
+	end</string>
+		<string>select
+	statdate,
+	case
+		when ag.full_name in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE') then 'KA'
+		else 'SME'
+	end as agent_type,
+	sum(esa.impression) as impression,
+	sum(esa.click) as click,
+	sum(esa.pay)/100 as cost
+from `ea_stat_adpos` esa
+inner join client c on esa.clientid = c.client_id
+inner join agent ag on esa.agentid = ag.agent_id 
+inner join industry ins on c.industry_id = ins.`industry_id`
+where statdate between '2014-03-03' and '2014-03-09'
+-- where statdate between '2014-02-24' and '2014-03-02'
+group by
+	statdate,
+	case
+		when ag.full_name in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE') then 'KA'
+		else 'SME'
+	end</string>
+		<string>SELECT
+	SUM(clickcost) 消耗金额,
+	SUM(confirm_cost) 收入本金
+FROM client_resbacklog_day crd
+inner join client c on crd.client_id = c.client_id
+inner join agent ag on c.agent_id = ag.agent_id
+WHERE service_line_code = 'WEIBO-CPC' AND logdate = '2014-03-02'</string>
+		<string>select
+	sum(pv),
+	sum(iv),
+	sum(d_consume),
+	sum(f_consume)
+from weibo_report
+where statdate = '2014-03-02'</string>
+		<string>select
+	sum(d_consume),
+	sum(f_consume)
+from weibo_report
+where statdate = '2014-03-02'</string>
+		<string>SELECT
+	case
+		when ag.full_name in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE') then 'KA'
+		else 'SME'
+	end as agent_type,
+	SUM(clickcost)/100 消耗金额,
+	SUM(confirm_cost)/100 收入本金
+FROM client_resbacklog_day crd
+inner join client c on crd.client_id = c.client_id
+inner join agent ag on c.agent_id = ag.agent_id
+WHERE service_line_code = 'PINPAI-CPC' AND logdate between '2014-01-01' and '2014-03-02'
+GROUP BY
+	case
+		when ag.full_name in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE') then 'KA'
+		else 'SME'
+	end</string>
+		<string>SELECT
+	SUM(clickcost) 消耗金额,
+	SUM(confirm_cost) 收入本金
+FROM client_resbacklog_day crd
+inner join client c on crd.client_id = c.client_id
+inner join agent ag on c.agent_id = ag.agent_id
+WHERE service_line_code = 'PINPAI-CPC' AND logdate between '2014-01-01' and '2014-03-02'</string>
+		<string>SELECT
+	SUM(clickcost)/100 消耗金额,
+	SUM(confirm_cost)/100 收入本金
+FROM client_resbacklog_day crd
+inner join client c on crd.client_id = c.client_id
+inner join agent ag on c.agent_id = ag.agent_id
+WHERE service_line_code = 'PINPAI-CPC' AND logdate between '2014-01-01' and '2014-03-02'</string>
+		<string>SELECT
+	case
+		when ag.full_name in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE') then 'KA'
+		else 'SME'
+	end as agent_type,
+	SUM(clickcost) 消耗点数,
+	SUM(confirm_cost)/100 收入本金
+FROM client_resbacklog_day crd
+inner join client c on crd.client_id = c.client_id
+inner join agent ag on c.agent_id = ag.agent_id
+WHERE service_line_code = 'PINPAI-CPC' AND logdate between '2014-01-01' and '2014-03-02'
+GROUP BY
+	case
+		when ag.full_name in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE') then 'KA'
+		else 'SME'
+	end</string>
+		<string>SELECT
+	case
+		when ag.full_name in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE') then 'KA'
+		else 'SME'
+	end as agent_type,
+	SUM(clickcost) 消耗点数,
+	SUM(confirm_cost) 收入本金
+FROM client_resbacklog_day crd
+inner join client c on crd.client_id = c.client_id
+inner join agent ag on c.agent_id = ag.agent_id
+WHERE service_line_code = 'PINPAI-CPC' AND logdate between '2014-01-01' and '2014-03-02'
+GROUP BY
+	case
+		when ag.full_name in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE') then 'KA'
+		else 'SME'
+	end</string>
+		<string>select *
+FROM client_resbacklog_day limit 10</string>
+		<string>select
+	bal.agent_type,
+	bal.agent_name,
+	bal.balance,
+	ifnull(cost.本周日均消耗,0) as 本周日均消耗
+from (select 
+	x.agent_id,
+	case
+		when ag.full_name in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE') then 'KA'
+		else 'SME'
+	end as agent_type,
+	ag.full_name as agent_name,
+	ifnull(x.charged,0)/100 as charged,
+	ifnull(y.cost,0)/100 as cost,
+	(ifnull(x.charged,0) - ifnull(y.cost,0))/100 as balance
+from (SELECT
+	agent_id,
+	SUM(point) as charged
+FROM client_trans
+WHERE `code` = 'PINPAI-CPC'
+	AND create_time &lt; '2014-03-03 00:00:00'
+group by agent_id) x
+inner join agent ag on x.agent_id = ag.agent_id and instr(ag.full_name,'测试') = 0 and ag.status = 1
+left outer join (SELECT
+	agent_id,
+	SUM(point_cost) as cost
+FROM client_order
+WHERE `code` = 'PINPAI-CPC'
+	AND create_time &lt; '2014-03-03 00:00:00'
+group by agent_id) y on x.agent_id = y.agent_id) bal
+left outer join (select
+							ag.full_name,
+							ag.agent_id,
+							sum(esa.pay)/100 as pay,
+							sum(esa.pay)/100/7 as 本周日均消耗
+						from `ea_stat_adpos` esa
+						inner join client c on esa.clientid = c.client_id
+						inner join agent ag on esa.agentid = ag.agent_id 
+						where statdate between '2014-02-24' and '2014-03-02'
+						group by
+							ag.full_name,ag.agent_id) cost on bal.agent_id = cost.agent_id
+where bal.balance &gt; 0 or ifnull(cost.本周日均消耗,0) &gt; 0</string>
+		<string>select
+	bal.agent_type,
+	bal.agent_name,
+	bal.balance,
+	ifnull(cost.本周日均消耗,0) as 本周日均消耗
+from (select 
+	x.agent_id,
+	case
+		when ag.full_name in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE') then 'KA'
+		else 'SME'
+	end as agent_type,
+	ag.full_name as agent_name,
+	ifnull(x.charged,0)/100 as charged,
+	ifnull(y.cost,0)/100 as cost,
+	(ifnull(x.charged,0) - ifnull(y.cost,0))/100 as balance
+from (SELECT
+	agent_id,
+	SUM(point) as charged
+FROM client_trans
+WHERE `code` = 'PINPAI-CPC'
+	AND create_time &lt; '2014-03-03 00:00:00'
+group by agent_id) x
+inner join agent ag on x.agent_id = ag.agent_id and instr(ag.full_name,'测试') = 0 and ag.status = 1
+left outer join (SELECT
+	agent_id,
+	SUM(point_cost) as cost
+FROM client_order
+WHERE `code` = 'PINPAI-CPC'
+	AND create_time &lt; '2014-03-03 00:00:00'
+group by agent_id) y on x.agent_id = y.agent_id) bal
+left outer join (select
+							ag.full_name,
+							ag.agent_id,
+							sum(esa.pay)/100 as pay,
+							sum(esa.pay)/100/7 as 本周日均消耗
+						from `ea_stat_adpos` esa
+						inner join client c on esa.clientid = c.client_id
+						inner join agent ag on esa.agentid = ag.agent_id 
+						where statdate between '2014-02-24' and '2014-03-02'
+						group by
+							ag.full_name,ag.agent_id) cost on bal.agent_id = cost.agent_id
+where bal.balance = 0 and ifnull(cost.本周日均消耗,0) = 0</string>
+		<string>select
+	bal.agent_type,
+	bal.agent_name,
+	bal.balance,
+	ifnull(cost.本周日均消耗,0) as 本周日均消耗
+from (select 
+	x.agent_id,
+	case
+		when ag.full_name in ('北京昂然时代广告有限公司','北京派瑞威行广告有限公司','北京新意互动广告有限公司','华扬联众数字技术股份有限公司深圳分公司','上海好耶趋势广告传播有限公司','上海聚胜万合广告有限公司','上海顺为广告传播有限公司','上海万域文化传媒有限公司','北京奕天共创广告有限公司','新浪AE') then 'KA'
+		else 'SME'
+	end as agent_type,
+	ag.full_name as agent_name,
+	ifnull(x.charged,0)/100 as charged,
+	ifnull(y.cost,0)/100 as cost,
+	(ifnull(x.charged,0) - ifnull(y.cost,0))/100 as balance
+from (SELECT
+	agent_id,
+	SUM(point) as charged
+FROM client_trans
+WHERE `code` = 'PINPAI-CPC'
+	AND create_time &lt; '2014-03-03 00:00:00'
+group by agent_id) x
+inner join agent ag on x.agent_id = ag.agent_id and instr(ag.full_name,'测试') = 0 and ag.status = 1
+left outer join (SELECT
+	agent_id,
+	SUM(point_cost) as cost
+FROM client_order
+WHERE `code` = 'PINPAI-CPC'
+	AND create_time &lt; '2014-03-03 00:00:00'
+group by agent_id) y on x.agent_id = y.agent_id) bal
+left outer join (select
+							ag.full_name,
+							ag.agent_id,
+							sum(esa.pay)/100 as pay,
+							sum(esa.pay)/100/7 as 本周日均消耗
+						from `ea_stat_adpos` esa
+						inner join client c on esa.clientid = c.client_id
+						inner join agent ag on esa.agentid = ag.agent_id 
+						where statdate between '2014-02-24' and '2014-03-02'
+						group by
+							ag.full_name,ag.agent_id) cost on bal.agent_id = cost.agent_id</string>
+	</array>
+	<key>rdbms_type</key>
+	<string>mysql</string>
+	<key>rdbms_version</key>
+	<string>5.5.12-log</string>
+	<key>version</key>
+	<integer>1</integer>
+</dict>
+</plist>
